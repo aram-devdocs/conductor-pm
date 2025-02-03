@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "conductor-pm-agent"
+version = "0.1.0"
+description = "Job scheduling agent for Conductor PM"
+authors = ["Aram Hammoudeh <aram.hammoudeh@indr.com>"]
+packages = [{include = "*.py"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+prisma = "^0.11.0"
+schedule = "1.2.1"
+python-dotenv = "1.0.0"
+croniter = "6.0.0"
+fastapi = "0.109.0"
+uvicorn = "0.27.0.post1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+black = "^24.1.1"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api" 

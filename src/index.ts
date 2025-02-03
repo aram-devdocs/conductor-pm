@@ -1,16 +1,70 @@
 import { app, BrowserWindow } from "electron";
-
 import express from "express";
+import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
 const server = express();
 const PORT = process.env.PORT || 3001;
 
 // Basic middleware
 server.use(express.json());
 
+// Job management endpoints
+server.post("/api/jobs", async (req, res) => {
+  try {
+    const { name, schedule, command } = req.body;
+    const job = await prisma.job.create({
+      data: {
+        name,
+        schedule,
+        command,
+        isActive: true,
+      }
+    });
+    res.json(job);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create job" });
+  }
+});
+
+server.get("/api/jobs", async (req, res) => {
+  try {
+    const jobs = await prisma.job.findMany();
+    res.json(jobs);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch jobs" });
+  }
+});
+
+server.put("/api/jobs/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, schedule, command, isActive } = req.body;
+    const job = await prisma.job.update({
+      where: { id: parseInt(id) },
+      data: { name, schedule, command, isActive }
+    });
+    res.json(job);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update job" });
+  }
+});
+
+server.delete("/api/jobs/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.job.delete({
+      where: { id: parseInt(id) }
+    });
+    res.json({ message: "Job deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete job" });
+  }
+});
+
 // Example routes
 server.get("/", (req, res) => {
-  res.json({ message: "Expresss server is running!" });
+  res.json({ message: "Express server is running!" });
 });
 
 // Additional route for testing

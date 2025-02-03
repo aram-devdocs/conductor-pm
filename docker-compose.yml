@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  job-agent:
+    build: 
+      context: .
+      dockerfile: python_service/Dockerfile
+    volumes:
+      - ./data.db:/app/data.db
+    environment:
+      - DATABASE_URL=file:/app/data.db
+    restart: unless-stopped
+
+  # Note: The Express server is part of the Electron app and runs locally 
+  # TODO: Move buisness logic to shared library and add seperate implementation here for both client and server, to provide same service as electron
