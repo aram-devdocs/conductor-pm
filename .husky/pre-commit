@@ -1,0 +1,4 @@
+npm lint || {
+  echo "Linting failed"
+  exit 1
+}
