@@ -406,3 +406,38 @@ For more detailed documentation and guides, please visit our [GitHub Discussions
 ### Husky Hooks
 
 - `yarn prepare`: Set up Husky git hooks for pre-commit checks
+
+## Design System
+
+Conductor PM uses a custom design system built on top of [Material-UI (MUI)](https://mui.com/), a popular React UI framework. The design system consists of reusable UI components organized into the Core UI system, which provides a consistent and efficient way to build user interfaces throughout the application.
+
+### Storybook
+
+We use [Storybook](https://storybook.js.org/) for developing and documenting our UI components. Storybook allows us to create isolated component examples, making it easier to test, document, and showcase our components.
+
+To run Storybook locally, use the following command:
+
+```bash
+yarn storybook
+```
+
+This will start the Storybook development server, and you can access it at `http://localhost:6006`.
+
+To build a static version of Storybook for deployment, run:
+
+```bash
+yarn build-storybook
+```
+
+The static files will be generated in the `storybook-static` directory.
+
+### Core UI System
+
+The Core UI system is a collection of reusable UI components built on top of MUI that provide a consistent and efficient way to build user interfaces in the Conductor PM application. It organizes components into categories such as inputs, data display, layout, navigation, and more.
+
+For more detailed information on the Core UI system, including how to use and customize components, please refer to the [CORE.md](src/lib/ui/core/CORE.md) file.
+
+### Storybook Commands
+
+- `yarn storybook`: Start the Storybook development server
+- `yarn build-storybook`: Build a static version of Storybook for deployment
