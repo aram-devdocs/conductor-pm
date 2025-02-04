@@ -3,10 +3,6 @@ datasource db {
   url      = "file:../data.db"
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 generator py_client {
   provider             = "prisma-client-py"
   interface            = "asyncio"
@@ -14,13 +10,13 @@ generator py_client {
 }
 
 model Job {
-  id          Int      @id @default(autoincrement())
-  name        String
-  schedule    String   // Cron expression
-  command     String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  lastRun     DateTime?
-  nextRun     DateTime?
-} 
+  id        Int       @id @default(autoincrement())
+  name      String
+  schedule  String // Cron expression
+  command   String
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  lastRun   DateTime?
+  nextRun   DateTime?
+}

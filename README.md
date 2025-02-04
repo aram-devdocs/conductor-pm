@@ -365,3 +365,44 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 For more detailed documentation and guides, please visit our [GitHub Discussions](https://github.com/yourusername/conductor-pm/discussions) page.
+
+## Available Commands
+
+### Development Commands
+
+- `npm start`: Launch the Electron application in development mode
+- `npm run python:dev`: Start the Python development environment with the AI agent
+- `npm run setup`: Complete project setup, installing all dependencies and generating Prisma clients
+- `npm run lint`: Run ESLint to check code quality and style
+
+### Build and Packaging Commands
+
+- `npm run package`: Package the Electron application for your current platform
+- `npm run make`: Create distributable packages (installers) for the application
+- `npm run publish`: Publish the application to a distribution platform
+
+### Database Management
+
+- `npm run prisma:generate`: Generate Prisma client based on the schema
+- `npm run prisma:migrate`: Run database migrations
+- `npm run python:fix-lock`: Update Poetry lock file without changing dependencies
+
+### Python Environment
+
+- `npm run python:setup`: Install Python dependencies using Poetry
+- `npm run python:dev:fix`: Fix Poetry lock file and start the Python development environment
+
+### Docker Commands
+
+- `npm run docker:build`: Build Docker containers
+- `npm run docker:up`: Start Docker containers in detached mode
+- `npm run docker:down`: Stop and remove Docker containers
+- `npm run docker:logs`: View logs from Docker containers
+
+### Cleanup Command
+
+- `npm run clean`: Remove `node_modules`, `.webpack`, and `.out` directories to resolve potential build issues
+
+### Husky Hooks
+
+- `npm run prepare`: Set up Husky git hooks for pre-commit checks
