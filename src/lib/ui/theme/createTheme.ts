@@ -61,21 +61,21 @@ const theme = createTheme({
     mode: "light", // Default mode
     ...lightPalette,
   },
-  typography: {
-    fontFamily: [
-      "-apple-system",
-      "BlinkMacSystemFont",
-      '"Segoe UI"',
-      "Roboto",
-      '"Helvetica Neue"',
-      "Arial",
-      "sans-serif",
-    ].join(","),
-    htmlFontSize: 16,
-    h1: { fontSize: "2.5rem", fontWeight: 500 },
-    h2: { fontSize: "2rem", fontWeight: 500 },
-    // ... other typography settings
-  },
+  //   typography: {
+  //     fontFamily: [
+  //       "-apple-system",
+  //       "BlinkMacSystemFont",
+  //       '"Segoe UI"',
+  //       "Roboto",
+  //       '"Helvetica Neue"',
+  //       "Arial",
+  //       "sans-serif",
+  //     ].join(","),
+  //     htmlFontSize: 16,
+  //     h1: { fontSize: "2.5rem", fontWeight: 500 },
+  //     h2: { fontSize: "2rem", fontWeight: 500 },
+  //     // ... other typography settings
+  //   },
   spacing: 8,
   shape: {
     borderRadius: 4,
@@ -97,21 +97,21 @@ const theme = createTheme({
       sharp: "cubic-bezier(0.4, 0, 0.6, 1)",
     },
   },
-  shadows: [
-    "none",
-    "0px 2px 1px -1px rgba(0,0,0,0.2)",
-    // ... full shadow array up to 24
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-  ] as any,
-  components: {
-    MuiAppBar: {
-      defaultProps: {
-        color: "default",
-        variant: "outlined",
-      },
-    },
-    // ... other component overrides
-  },
+  //   shadows: [
+  //     "none",
+  //     "0px 2px 1px -1px rgba(0,0,0,0.2)",
+  //     // ... full shadow array up to 24
+  //     /* eslint-disable @typescript-eslint/no-explicit-any */
+  //   ] as any,
+//   components: {
+//     MuiAppBar: {
+//       defaultProps: {
+//         color: "default",
+//         variant: "outlined",
+//       },
+//     },
+//     // ... other component overrides
+//   },
   // Responsive breakpoints for media queries
   // ref: https://mui.com/material-ui/customization/breakpoints/
   breakpoints: {
