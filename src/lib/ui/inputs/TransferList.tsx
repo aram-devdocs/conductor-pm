@@ -1,16 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Grid,
   List,
   Card,
-  CardHeader,
   ListItem,
   ListItemText,
   ListItemIcon,
   Checkbox,
   Button,
-  Divider,
-} from '@mui/material';
+} from "@mui/material";
 
 export interface TransferListItem {
   id: string | number;
@@ -26,16 +24,22 @@ export interface TransferListProps {
 }
 
 function not(a: TransferListItem[], b: TransferListItem[]) {
-  return a.filter((value) => b.find(item => item.id === value.id) === undefined);
+  return a.filter(
+    (value) => b.find((item) => item.id === value.id) === undefined
+  );
 }
 
 function intersection(a: TransferListItem[], b: TransferListItem[]) {
-  return a.filter((value) => b.find(item => item.id === value.id) !== undefined);
+  return a.filter(
+    (value) => b.find((item) => item.id === value.id) !== undefined
+  );
 }
 
 export const TransferList = ({
-  leftTitle = 'Choices',
-  rightTitle = 'Chosen',
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  leftTitle = "Choices",
+  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
+  rightTitle = "Chosen",
   leftItems: initialLeft,
   rightItems: initialRight,
   onChange,
@@ -48,7 +52,7 @@ export const TransferList = ({
   const rightChecked = intersection(checked, right);
 
   const handleToggle = (item: TransferListItem) => () => {
-    const currentIndex = checked.findIndex(i => i.id === item.id);
+    const currentIndex = checked.findIndex((i) => i.id === item.id);
     const newChecked = [...checked];
 
     if (currentIndex === -1) {
@@ -106,16 +110,16 @@ export const TransferList = ({
               key={item.id}
               role="listitem"
               component="div"
-              sx={{ cursor: 'pointer' }}
+              sx={{ cursor: "pointer" }}
               onClick={handleToggle(item)}
             >
               <ListItemIcon>
                 <Checkbox
-                  checked={checked.findIndex(i => i.id === item.id) !== -1}
+                  checked={checked.findIndex((i) => i.id === item.id) !== -1}
                   tabIndex={-1}
                   disableRipple
                   inputProps={{
-                    'aria-labelledby': labelId,
+                    "aria-labelledby": labelId,
                   }}
                 />
               </ListItemIcon>
@@ -177,4 +181,4 @@ export const TransferList = ({
       <Grid item>{customList(right)}</Grid>
     </Grid>
   );
-}; 
+};
