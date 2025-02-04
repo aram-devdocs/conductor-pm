@@ -4,7 +4,7 @@ import { Toolbar } from "./Toolbar";
 import { Button, Typography } from "../..";
 
 const meta: Meta<typeof Toolbar> = {
-  title: "Core/Toolbar",
+  title: "Core/Layout/Toolbar",
   component: Toolbar,
   tags: ["autodocs"],
   argTypes: {

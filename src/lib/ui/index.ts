@@ -1,2 +1,5 @@
 export * from './core'
 export * from './theme'
+export * from './components'
+export * from './templates'
+export * from './views'

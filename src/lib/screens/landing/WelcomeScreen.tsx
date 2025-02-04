@@ -1,6 +1,6 @@
 import React from "react";
-import { Card, Typography, Button, Stack, Grid } from "../ui";
-import { useWelcome } from "../hooks";
+import { Card, Typography, Button, Stack, Grid } from "../../ui";
+import { useWelcome } from "../../hooks";
 
 export const WelcomeScreen: React.FC = () => {
   const { handleGetStarted } = useWelcome();

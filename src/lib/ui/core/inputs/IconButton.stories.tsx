@@ -6,9 +6,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import ShareIcon from '@mui/icons-material/Share';
 
 const meta: Meta<typeof IconButton> = {
-  title: 'Core/IconButton',
+  title: "Core/Inputs/IconButton",
   component: IconButton,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     color: {
       control: { type: 'select', options: ['default', 'primary', 'secondary', 'error', 'info', 'success', 'warning', 'inherit'] },

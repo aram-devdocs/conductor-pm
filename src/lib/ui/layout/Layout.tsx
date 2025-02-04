@@ -6,8 +6,19 @@ import {
   Typography,
   IconButton,
   Paper,
+  Drawer,
 } from "../core";
+import {
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ListItemIcon,
+  Divider,
+} from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import HomeIcon from "@mui/icons-material/Home";
+import ChatIcon from "@mui/icons-material/Chat";
 import { Breadcrumbs, BreadcrumbLink } from "../core/navigation/Breadcrumbs";
 import { useSPA } from "../../contexts/SPAContext";
 import { useColorMode } from "../../contexts";
@@ -18,8 +29,18 @@ interface LayoutProps {
   children: React.ReactNode;
 }
 
+const DRAWER_WIDTH = 240;
+
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { history, goBack, canGoBack, navigateTo } = useSPA();
+  const {
+    history,
+    goBack,
+    canGoBack,
+    navigateTo,
+    startingPoints,
+    screens,
+    currentScreen,
+  } = useSPA();
   const { mode, toggleColorMode } = useColorMode();
 
   const breadcrumbLinks: BreadcrumbLink[] = history.map((entry) => ({
@@ -27,8 +48,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     onClick: () => navigateTo(entry.id, entry.props, entry.title),
   }));
 
+  // Map of starting point IDs to their icons
+  const startingPointIcons: Record<string, React.ReactElement> = {
+    welcome: <HomeIcon />,
+    chat: <ChatIcon />,
+  };
+
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        // debug yellow border
+        border: "1px solid yellow",
+      }}
+    >
       <AppBar
         position="fixed"
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -69,32 +103,53 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <Breadcrumbs links={breadcrumbLinks} />
         </Paper>
       </AppBar>
-      {/* <Drawer
+      <Drawer
         variant="permanent"
         sx={{
-          width: 200,
+          width: DRAWER_WIDTH,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: 200, boxSizing: "border-box" },
+          [`& .MuiDrawer-paper`]: {
+            width: DRAWER_WIDTH,
+            boxSizing: "border-box",
+            top: "auto",
+            marginTop: "112px",
+          },
         }}
       >
-        // Add side menu items here
-      </Drawer> */}
+        <List>
+          {startingPoints.map((screenId) => (
+            <ListItem key={screenId} disablePadding>
+              <ListItemButton
+                selected={currentScreen === screenId}
+                onClick={() => navigateTo(screenId)}
+              >
+                {startingPointIcons[screenId] && (
+                  <ListItemIcon>{startingPointIcons[screenId]}</ListItemIcon>
+                )}
+                <ListItemText primary={screens[screenId].title || screenId} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+        <Divider />
+      </Drawer>
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 2,
-          marginTop: "112px", // Adjusted to account for both toolbars
+          marginTop: "112px",
+          marginLeft: `${DRAWER_WIDTH}px`,
           display: "flex",
           flexDirection: "column",
           gap: 2,
+          width: "100%",
+          //   debug blue border
+          border: "1px solid blue",
         }}
       >
         {children}
       </Box>
-      {/* <Box component="footer" sx={{ p: 1, bgcolor: "background.paper" }}>
-   // Add footer content here 
-      </Box> */}
     </Box>
   );
 };

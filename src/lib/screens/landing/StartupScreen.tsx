@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Typography, Button, Stack, Grid } from "../ui";
+import { Card, Typography, Button, Stack, Grid } from "../../ui";
 
 export const StartupScreen: React.FC = () => {
   return (

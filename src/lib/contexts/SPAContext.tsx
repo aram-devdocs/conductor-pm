@@ -11,6 +11,7 @@ interface Screen {
   component: React.LazyExoticComponent<React.ComponentType<any>>;
   props?: Record<string, any>;
   title?: string;
+  isStartingPoint?: boolean;
 }
 
 interface SPAContextType {
@@ -25,12 +26,18 @@ interface SPAContextType {
   registerScreen: (
     screenId: string,
     component: React.LazyExoticComponent<React.ComponentType<any>>,
-    title?: string
+    title?: string,
+    isStartingPoint?: boolean
   ) => void;
   setShowLayout: (show: boolean) => void;
   goBack: (steps?: number) => void;
   canGoBack: boolean;
   history: ScreenHistoryEntry[];
+  startingPoints: string[];
+  switchToStartingPoint: (
+    screenId: string,
+    props?: Record<string, any>
+  ) => void;
 }
 
 const SPAContext = createContext<SPAContextType | null>(null);
@@ -58,20 +65,58 @@ export const SPAProvider: React.FC<{ children: React.ReactNode }> = ({
     (
       screenId: string,
       component: React.LazyExoticComponent<React.ComponentType<any>>,
-      title?: string
+      title?: string,
+      isStartingPoint?: boolean
     ) => {
       setScreens((prev) => ({
         ...prev,
-        [screenId]: { component, title },
+        [screenId]: { component, title, isStartingPoint },
       }));
     },
     []
+  );
+
+  // Get all starting points
+  const startingPoints = Object.entries(screens)
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    .filter(([_, screen]) => screen.isStartingPoint)
+    .map(([id]) => id);
+
+  // Switch to a starting point, resetting history
+  const switchToStartingPoint = useCallback(
+    (screenId: string, props?: Record<string, any>) => {
+      if (!screens[screenId]?.isStartingPoint) {
+        console.error(`Screen ${screenId} is not a starting point`);
+        return;
+      }
+
+      // Reset history with just the new starting point
+      const newEntry = {
+        id: screenId,
+        props,
+        title: screens[screenId].title,
+      };
+      setHistory([newEntry]);
+      setHistoryIndex(0);
+      setCurrentScreen(screenId);
+      setScreens((prev) => ({
+        ...prev,
+        [screenId]: { ...prev[screenId], props },
+      }));
+    },
+    [screens]
   );
 
   const navigateTo = useCallback(
     (screenId: string, props?: Record<string, any>, title?: string) => {
       if (!screens[screenId]) {
         console.error(`Screen ${screenId} not found`);
+        return;
+      }
+
+      // If navigating to a starting point, use switchToStartingPoint instead
+      if (screens[screenId].isStartingPoint) {
+        switchToStartingPoint(screenId, props);
         return;
       }
 
@@ -88,7 +133,6 @@ export const SPAProvider: React.FC<{ children: React.ReactNode }> = ({
         setHistoryIndex(existingIndex);
       } else if (currentScreen !== screenId) {
         // Only add to history if it's a new screen
-        // Add new entry only if it's different from the current screen
         const newEntry = {
           id: screenId,
           props,
@@ -103,7 +147,7 @@ export const SPAProvider: React.FC<{ children: React.ReactNode }> = ({
 
       setCurrentScreen(screenId);
     },
-    [screens, historyIndex, history, currentScreen]
+    [screens, historyIndex, history, currentScreen, switchToStartingPoint]
   );
 
   const goBack = useCallback(
@@ -137,6 +181,8 @@ export const SPAProvider: React.FC<{ children: React.ReactNode }> = ({
     goBack,
     canGoBack: historyIndex > 0,
     history: history.slice(0, historyIndex + 1),
+    startingPoints,
+    switchToStartingPoint,
   };
 
   return <SPAContext.Provider value={value}>{children}</SPAContext.Provider>;
