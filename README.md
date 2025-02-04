@@ -68,10 +68,17 @@ The Python AI Agent communicates with the SQLite database through Prisma ORM, en
   - OpenAI API
   - Custom OpenAI-compatible endpoints
   - Ollama (planned)
+- Caching system with:
+  - Redis support for production
+  - Local file-based caching for development
+  - Automatic fallback mechanism
+  - TTL support and expiration handling
+  - Function result caching via decorators
 
 ### DevOps & Tools
 
 - Docker for containerization
+- Redis for distributed caching (in Docker)
 - Husky for git hooks and pre-commit checks
 - ESLint for code quality
 - Poetry for Python package management
@@ -122,6 +129,12 @@ This will:
    OPENAI_API_KEY=your_api_key_here
    OPENAI_MODEL=gpt-4  # or your preferred model
    AI_PROVIDER=openai  # or custom/ollama
+
+   # Configure caching
+   USE_REDIS=false  # Use local cache for development
+   REDIS_HOST=localhost
+   REDIS_PORT=6379
+   REDIS_DB=0
 
    # Install Ollama (macOS/Linux)
    curl https://ollama.ai/install.sh | sh
@@ -178,8 +191,93 @@ npm run prisma:migrate
 - \`/python_service\` - Python agent and backend services
   - \`/agent\` - AI agent implementation
   - \`/api\` - FastAPI routes and handlers
+  - \`/utils\` - Utility modules including caching system
 - \`/prisma\` - Database schema and migrations
 - \`/docker\` - Docker configuration files
+
+## Cache System
+
+The application includes a flexible caching system that supports both Redis (for production) and local file-based caching (for development).
+
+### Cache Configuration
+
+The cache system can be configured through environment variables:
+
+```bash
+USE_REDIS=true|false  # Enable Redis or use local cache
+REDIS_HOST=redis      # Redis host (use 'redis' for Docker)
+REDIS_PORT=6379       # Redis port
+REDIS_DB=0           # Redis database number
+```
+
+### Usage Examples
+
+```python
+from src.utils.cache import CacheManager
+
+# Initialize cache manager
+cache = CacheManager()
+
+# Basic operations
+cache.set("my_key", "my_value", ttl=3600)  # Cache for 1 hour
+value = cache.get("my_key")
+cache.delete("my_key")
+cache.clear()
+
+# Function result caching
+@cache.cached(ttl=3600)
+def expensive_operation(arg1, arg2):
+    return some_expensive_computation(arg1, arg2)
+```
+
+### Cache Features
+
+1. **Automatic Backend Selection**
+   - Uses Redis in Docker environment
+   - Falls back to local file-based cache in development
+   - Graceful fallback if Redis connection fails
+
+2. **TTL Support**
+   - Set expiration time for cached items
+   - Automatic cleanup of expired items
+   - Default TTL configurable per cache instance
+
+3. **Error Handling**
+   - Graceful error recovery
+   - Logging of cache operations
+   - Fallback mechanisms for failed operations
+
+4. **Function Decorator**
+   - Cache function results automatically
+   - Intelligent key generation based on arguments
+   - Configurable TTL per function
+
+5. **Serialization**
+   - Automatic serialization of complex objects
+   - Support for most Python data types
+   - Compressed storage for large objects
+
+### Best Practices
+
+1. **Key Naming**
+   - Use descriptive, hierarchical keys
+   - Include version/type information if needed
+   - Consider namespace prefixes for different services
+
+2. **TTL Selection**
+   - Set appropriate TTL based on data volatility
+   - Use shorter TTL for frequently changing data
+   - Consider infinite TTL for static data
+
+3. **Cache Invalidation**
+   - Implement clear invalidation strategies
+   - Use cache.delete() for targeted invalidation
+   - Use cache.clear() sparingly
+
+4. **Error Handling**
+   - Always handle cache misses gracefully
+   - Implement fallback data retrieval
+   - Log cache errors for monitoring
 
 ## Current State
 

@@ -6,6 +6,9 @@ from enum import Enum
 from ollama import AsyncClient
 import asyncio
 from functools import partial
+import os
+import json
+from src.utils.cache import CacheManager
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +23,30 @@ class AIResponse:
         self.raw_response = raw_response
 
 class BaseAIClient(ABC):
+    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None, api_base: Optional[str] = None):
+        self.api_key = api_key
+        self.model = model
+        self.api_base = api_base
+        self.cache = CacheManager()
+        
+    @property
+    def default_ttl(self):
+        """Default cache TTL for AI responses (1 hour)"""
+        return 3600
+        
+    def _generate_cache_key(self, messages: List[Dict[str, str]], **kwargs) -> str:
+        """Generate a unique cache key for the request"""
+        key_parts = [
+            self.model,
+            json.dumps(messages, sort_keys=True),
+            json.dumps(kwargs, sort_keys=True)
+        ]
+        return f"ai_response_{'_'.join(key_parts)}"
+        
+    def _generate_embedding_cache_key(self, text: str) -> str:
+        """Generate a unique cache key for embeddings"""
+        return f"ai_embedding_{self.model}_{text}"
+
     @abstractmethod
     async def chat_completion(self, messages: List[Dict[str, str]], **kwargs) -> AIResponse:
         pass
@@ -36,8 +63,7 @@ class OpenAIClient(BaseAIClient):
         api_base: Optional[str] = None,
         api_type: str = "openai"
     ):
-        self.api_key = api_key
-        self.model = model
+        super().__init__(api_key=api_key, model=model, api_base=api_base)
         self.client = openai.AsyncOpenAI(
             api_key=api_key,
             base_url=api_base if api_base else "https://api.openai.com/v1"
@@ -51,6 +77,13 @@ class OpenAIClient(BaseAIClient):
         max_tokens: Optional[int] = None,
         **kwargs
     ) -> AIResponse:
+        cache_key = self._generate_cache_key(messages, **kwargs)
+        
+        # Try to get from cache first
+        cached_response = self.cache.get(cache_key)
+        if cached_response is not None:
+            return AIResponse(content=cached_response)
+            
         try:
             response = await self.client.chat.completions.create(
                 model=self.model,
@@ -59,21 +92,36 @@ class OpenAIClient(BaseAIClient):
                 max_tokens=max_tokens,
                 **kwargs
             )
+            result = response.model_dump()
+            
+            # Cache the result
+            self.cache.set(cache_key, result, ttl=self.default_ttl)
             return AIResponse(
-                content=response.choices[0].message.content,
-                raw_response=response
+                content=result['choices'][0]['message']['content'],
+                raw_response=result
             )
         except Exception as e:
             logger.error(f"Error in chat completion: {str(e)}")
             raise
 
     async def embedding(self, text: str) -> List[float]:
+        cache_key = self._generate_embedding_cache_key(text)
+        
+        # Try to get from cache first
+        cached_embedding = self.cache.get(cache_key)
+        if cached_embedding is not None:
+            return cached_embedding
+            
         try:
             response = await self.client.embeddings.create(
                 model="text-embedding-ada-002",
                 input=text
             )
-            return response.data[0].embedding
+            embedding = response.data[0].embedding
+            
+            # Cache the result
+            self.cache.set(cache_key, embedding, ttl=self.default_ttl)
+            return embedding
         except Exception as e:
             logger.error(f"Error in embedding: {str(e)}")
             raise
@@ -84,7 +132,7 @@ class OllamaClient(BaseAIClient):
         model: str = "llama3.2",
         api_base: str = "http://localhost:11434",
     ):
-        self.model = model
+        super().__init__(model=model, api_base=api_base)
         self.client = AsyncClient(host=api_base)
 
     async def chat_completion(
@@ -94,6 +142,13 @@ class OllamaClient(BaseAIClient):
         max_tokens: Optional[int] = None,
         **kwargs
     ) -> AIResponse:
+        cache_key = self._generate_cache_key(messages, **kwargs)
+        
+        # Try to get from cache first
+        cached_response = self.cache.get(cache_key)
+        if cached_response is not None:
+            return AIResponse(content=cached_response)
+            
         try:
             response = await self.client.chat(
                 model=self.model,
@@ -104,6 +159,8 @@ class OllamaClient(BaseAIClient):
                 }
             )
             
+            # Cache the result
+            self.cache.set(cache_key, response['message']['content'], ttl=self.default_ttl)
             return AIResponse(
                 content=response['message']['content'],
                 raw_response=response
@@ -113,15 +170,84 @@ class OllamaClient(BaseAIClient):
             raise
 
     async def embedding(self, text: str) -> List[float]:
+        cache_key = self._generate_embedding_cache_key(text)
+        
+        # Try to get from cache first
+        cached_embedding = self.cache.get(cache_key)
+        if cached_embedding is not None:
+            return cached_embedding
+            
         try:
             response = await self.client.embeddings(
                 model=self.model,
                 prompt=text,
             )
             
+            # Cache the result
+            self.cache.set(cache_key, response['embeddings'], ttl=self.default_ttl)
             return response['embeddings']
         except Exception as e:
             logger.error(f"Error in Ollama embedding: {str(e)}")
+            raise
+
+class CustomAIClient(BaseAIClient):
+    def __init__(self, api_key: str, model: str, api_base: str):
+        super().__init__(api_key=api_key, model=model, api_base=api_base)
+        import httpx
+        self.client = httpx.AsyncClient(
+            base_url=api_base,
+            headers={"Authorization": f"Bearer {api_key}"}
+        )
+
+    async def chat_completion(self, messages: List[Dict[str, str]], **kwargs) -> AIResponse:
+        cache_key = self._generate_cache_key(messages, **kwargs)
+        
+        # Try to get from cache first
+        cached_response = self.cache.get(cache_key)
+        if cached_response is not None:
+            return AIResponse(content=cached_response)
+            
+        try:
+            response = await self.client.post("/v1/chat/completions", json={
+                "model": self.model,
+                "messages": messages,
+                **kwargs
+            })
+            response.raise_for_status()
+            result = response.json()
+            
+            # Cache the result
+            self.cache.set(cache_key, result['choices'][0]['message']['content'], ttl=self.default_ttl)
+            return AIResponse(
+                content=result['choices'][0]['message']['content'],
+                raw_response=result
+            )
+        except Exception as e:
+            logger.error(f"Error in chat completion: {str(e)}")
+            raise
+
+    async def embedding(self, text: str) -> List[float]:
+        cache_key = self._generate_embedding_cache_key(text)
+        
+        # Try to get from cache first
+        cached_embedding = self.cache.get(cache_key)
+        if cached_embedding is not None:
+            return cached_embedding
+            
+        try:
+            response = await self.client.post("/v1/embeddings", json={
+                "model": self.model,
+                "input": text
+            })
+            response.raise_for_status()
+            result = response.json()
+            embedding = result["data"][0]["embedding"]
+            
+            # Cache the result
+            self.cache.set(cache_key, embedding, ttl=self.default_ttl)
+            return embedding
+        except Exception as e:
+            logger.error(f"Error generating embedding: {str(e)}")
             raise
 
 class AIClientFactory:
@@ -144,6 +270,6 @@ class AIClientFactory:
         elif provider == AIProvider.CUSTOM:
             if not api_key:
                 raise ValueError("API key is required for custom provider")
-            return OpenAIClient(api_key=api_key, model=model, api_base=api_base)
+            return CustomAIClient(api_key=api_key, model=model, api_base=api_base)
         else:
             raise ValueError(f"Unsupported AI provider: {provider}") 

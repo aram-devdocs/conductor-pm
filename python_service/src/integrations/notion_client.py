@@ -2,6 +2,7 @@ import os
 import logging
 from notion_client import Client
 from dotenv import load_dotenv
+from src.utils.cache import CacheManager
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -10,11 +11,24 @@ class NotionIntegration:
     def __init__(self):
         self.client = Client(auth=os.environ["NOTION_TOKEN"])
         self.database_id = os.environ["NOTION_DATABASE_ID"]
+        self.cache = CacheManager()
+
+    @property
+    def default_ttl(self):
+        """Default cache TTL for Notion data (5 minutes)"""
+        return 300
 
     def get_current_sprint(self):
         """
         Gets the current sprint tasks with normalized properties
         """
+        cache_key = f"notion_sprint_{self.database_id}"
+        
+        # Try to get from cache first
+        cached_data = self.cache.get(cache_key)
+        if cached_data is not None:
+            return cached_data
+            
         try:
             response = self.client.databases.query(
                 database_id=self.database_id,
@@ -41,7 +55,11 @@ class NotionIntegration:
                 }
                 processed_results.append(full_page_data)
                 
-            return {'results': processed_results}
+            result = {'results': processed_results}
+            
+            # Cache the result
+            self.cache.set(cache_key, result, ttl=self.default_ttl)
+            return result
         
         except Exception as e:
             logger.error(f"Error getting current sprint: {str(e)}")
@@ -99,10 +117,19 @@ class NotionIntegration:
 
     def get_database(self, database_id):
         """
-        Gets a database from Notion
+        Gets a database from Notion with caching
         """
+        cache_key = f"notion_db_{database_id}"
+        
+        # Try to get from cache first
+        cached_data = self.cache.get(cache_key)
+        if cached_data is not None:
+            return cached_data
+            
         try:
             database = self.client.databases.query(database_id=database_id)
+            # Cache the result
+            self.cache.set(cache_key, database, ttl=self.default_ttl)
             return database
         except Exception as e:
             logger.error(f"Error getting database: {str(e)}")
@@ -110,10 +137,19 @@ class NotionIntegration:
 
     def get_page(self, page_id):
         """
-        Gets a page from Notion
+        Gets a page from Notion with caching
         """
+        cache_key = f"notion_page_{page_id}"
+        
+        # Try to get from cache first
+        cached_data = self.cache.get(cache_key)
+        if cached_data is not None:
+            return cached_data
+            
         try:
             page = self.client.pages.retrieve(page_id=page_id)
+            # Cache the result
+            self.cache.set(cache_key, page, ttl=self.default_ttl)
             return page
         except Exception as e:
             logger.error(f"Error getting page: {str(e)}")
@@ -121,10 +157,19 @@ class NotionIntegration:
 
     def get_all_users(self):
         """
-        Gets all users from Notion
+        Gets all users from Notion with caching
         """
+        cache_key = "notion_users"
+        
+        # Try to get from cache first
+        cached_data = self.cache.get(cache_key)
+        if cached_data is not None:
+            return cached_data
+            
         try:
             users = self.client.users.list()
+            # Cache the result with a longer TTL since user list changes less frequently
+            self.cache.set(cache_key, users, ttl=3600)  # Cache for 1 hour
             return users
         except Exception as e:
             logger.error(f"Error getting all users: {str(e)}")

@@ -9,7 +9,25 @@ services:
       - ./data.db:/app/data.db
     environment:
       - DATABASE_URL=file:/app/data.db
+      - USE_REDIS=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_DB=0
+    depends_on:
+      - redis
     restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+volumes:
+  redis_data:
 
   # Note: The Express server is part of the Electron app and runs locally 
   # TODO: Move business logic to shared library and add separate implementation here for both client and server, to provide same service as electron

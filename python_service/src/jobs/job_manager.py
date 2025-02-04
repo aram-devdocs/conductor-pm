@@ -1,8 +1,9 @@
 import asyncio
 import logging
 import subprocess
-from datetime import datetime
+from datetime import datetime, timezone
 from croniter import croniter
+from src.utils.cache import CacheManager
 
 logger = logging.getLogger(__name__)
 
@@ -12,17 +13,41 @@ class JobManager:
         self.db_client = database_client
         self.running = False
         self.check_jobs_task = None
+        self.cache = CacheManager()
+
+    @property
+    def default_ttl(self):
+        """Default cache TTL for job execution results (1 hour)"""
+        return 3600
 
     async def execute_job(self, job):
         """
         Execute a specific job and update its run status
         """
+        # Ensure job's lastRun is timezone-aware
+        last_run_str = job.lastRun.isoformat() if job.lastRun else 'never'
+        cache_key = f"job_result_{job.id}_{last_run_str}"
+        
         try:
+            # Check if we have a cached result from the last execution
+            cached_result = self.cache.get(cache_key)
+            if cached_result is not None:
+                logger.info(f"Using cached result for job {job.name}")
+                return cached_result
+                
             logger.info(f"Executing job: {job.name}")
             process = subprocess.Popen(
                 job.command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
             stdout, stderr = process.communicate()
+
+            result = {
+                'success': process.returncode == 0,
+                'stdout': stdout.decode() if stdout else None,
+                'stderr': stderr.decode() if stderr else None,
+                'return_code': process.returncode,
+                'execution_time': datetime.now(timezone.utc).isoformat()
+            }
 
             if process.returncode == 0:
                 logger.info(f"Job {job.name} completed successfully")
@@ -30,15 +55,27 @@ class JobManager:
                 logger.error(f"Job {job.name} failed: {stderr.decode()}")
 
             # Update last run time
-            await self.db_client.update_job_last_run(job.id, datetime.now())
+            current_time = datetime.now(timezone.utc)
+            await self.db_client.update_job_last_run(job.id, current_time)
 
             # Calculate and update next run time
-            cron = croniter(job.schedule, datetime.now())
-            next_run = cron.get_next(datetime)
+            cron = croniter(job.schedule, current_time)
+            next_run = cron.get_next(datetime).replace(tzinfo=timezone.utc)
             await self.db_client.update_job_next_run(job.id, next_run)
+            
+            # Cache the successful result
+            if result['success']:
+                self.cache.set(cache_key, result, ttl=self.default_ttl)
+                
+            return result
 
         except Exception as e:
             logger.error(f"Error executing job {job.name}: {str(e)}")
+            return {
+                'success': False,
+                'error': str(e),
+                'execution_time': datetime.now(timezone.utc).isoformat()
+            }
 
     async def check_and_run_jobs(self):
         """
@@ -47,7 +84,7 @@ class JobManager:
         try:
             while self.running:
                 try:
-                    current_time = datetime.now()
+                    current_time = datetime.now(timezone.utc)
                     jobs = await self.db_client.get_active_jobs(current_time)
 
                     for job in jobs:
