@@ -21,18 +21,17 @@ Conductor PM is an open-source project management tool that leverages AI to auto
 The system consists of three main components:
 
 1. **Electron Client**: React-based desktop application that provides the user interface
-2. **REST Server**: Express.js server handling communication between the client and agent
-3. **AI Agent**: Python-based service that manages scheduled tasks and AI interactions
+2. **Python AI Agent**: FastAPI-based service handling communication, task management, and AI interactions
+3. **Database**: SQLite for local data storage
 
 ```
 ┌───────────────────────┐      ┌──────────────────────┐
 │   Electron Client     │◄────►│    Python AI Agent   │
-│  (React Frontend +    │      │    (FastAPI + ORM)   │
-│   Express Server)     │      │                      │
-└───────────┬───────────┘      └──────────┬───────────┘
-            │                             │
-            │         ┌───────────────┐   │
-            ├────────►│    SQLite     │◄──┤
+│  (React Frontend)     │      │    (FastAPI + ORM)   │
+└─────────── ───────────┘      └──────────┬───────────┘
+                                          │
+                      ┌───────────────┐   │
+                      │    SQLite     │◄──┤
                       │   Database    │   │
                       └───────────────┘   │
                                           │
@@ -42,7 +41,7 @@ The system consists of three main components:
                       └─────────────┘
 ```
 
-Both the Express server and Python AI agent communicate with the SQLite database through Prisma ORM, ensuring type-safe database operations and consistent data access patterns. The Python AI agent is containerized and can be run on any machine with Docker installed, and it handles communication with the OpenAI compatible AI backend of your choice, or a local Ollama instance.
+The Python AI Agent communicates with the SQLite database through Prisma ORM, ensuring type-safe database operations and consistent data access patterns. The agent handles communication with the OpenAI compatible AI backend of your choice, or a local Ollama instance.
 
 ## Technology Stack
 
