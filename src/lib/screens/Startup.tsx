@@ -1,19 +1,9 @@
 import React from "react";
 import { Card, Typography, Button, Stack, Grid } from "../ui";
-import { useColorMode } from "../contexts";
 
 export const StartupScreen: React.FC = () => {
-  const { mode, toggleColorMode } = useColorMode();
-
   return (
     <Grid container spacing={2} justifyContent="center" padding={3}>
-      <Grid item xs={12}>
-        <Stack direction="row" justifyContent="flex-end">
-          <Button onClick={toggleColorMode}>
-            {mode === "light" ? "Dark Mode" : "Light Mode"}
-          </Button>
-        </Stack>
-      </Grid>
       <Grid item xs={12} sm={10} md={8} lg={6}>
         <Card>
           <Stack spacing={2}>

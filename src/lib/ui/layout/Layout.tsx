@@ -6,10 +6,13 @@ import {
   Typography,
   IconButton,
   Paper,
-} from "@mui/material";
+} from "../core";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Breadcrumbs, BreadcrumbLink } from "../core/navigation/Breadcrumbs";
 import { useSPA } from "../../contexts/SPAContext";
+import { useColorMode } from "../../contexts";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,6 +20,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { history, goBack, canGoBack, navigateTo } = useSPA();
+  const { mode, toggleColorMode } = useColorMode();
 
   const breadcrumbLinks: BreadcrumbLink[] = history.map((entry) => ({
     label: entry.title || entry.id,
@@ -38,6 +42,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             onClick={() => goBack()}
           >
             <ArrowBackIcon />
+          </IconButton>
+          <IconButton
+            color="inherit"
+            aria-label="toggle dark mode"
+            sx={{ mr: 2 }}
+            onClick={toggleColorMode}
+          >
+            {mode === "light" ? <Brightness4Icon /> : <Brightness7Icon />}
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             Conductor PM

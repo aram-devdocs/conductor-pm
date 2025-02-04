@@ -11,3 +11,4 @@ export { Switch } from "./Switch";
 export { TextField } from "./TextField";
 export { TransferList } from "./TransferList";
 export { ToggleButton } from "./ToggleButton";
+export { IconButton } from "./IconButton";
