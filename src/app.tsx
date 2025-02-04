@@ -1,5 +1,9 @@
 import { createRoot } from "react-dom/client";
-import { Startup } from "./lib";
+import { Startup, ThemeProvider } from "./lib";
 
 const root = createRoot(document.body);
-root.render(<Startup />);
+root.render(
+  <ThemeProvider>
+    <Startup />
+  </ThemeProvider>
+);

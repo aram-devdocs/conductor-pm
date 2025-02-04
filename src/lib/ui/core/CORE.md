@@ -10,6 +10,14 @@ The Core UI system leverages the power and flexibility of MUI components by wrap
 - Extend the functionality of MUI components as needed
 - Provide a simplified and more focused API for our specific use cases
 
+## Global Theme System
+
+The Core UI system utilizes a global theme system built with Material UI's theming capabilities. The theme is defined in the `src/lib/ui/theme` directory and is applied to the entire application using a custom `ThemeProvider` component.
+
+To customize the theme, modify the `createTheme.ts` file in the `theme` directory. You can change the palette, typography, spacing, and other theme options to match your desired design system.
+
+The custom theme is then passed to the `ThemeProvider` component in `src/app.tsx`, ensuring that all components within the application have access to the theme variables and styles.
+
 ## Available Components
 
 The Core UI system organizes components into the following categories:
@@ -42,4 +50,4 @@ If you need to customize or extend a Core UI component, you can do so by modifyi
 - Update the corresponding Storybook story to reflect any changes
 - Document any new props or behavior in the component's JSDoc comments
 
-By leveraging the Core UI system, developers can create consistent, high-quality user interfaces more efficiently, while also maintaining the flexibility to customize and extend components as needed. 
+By leveraging the Core UI system and its global theme, developers can create consistent, high-quality user interfaces more efficiently, while also maintaining the flexibility to customize and extend components as needed. 

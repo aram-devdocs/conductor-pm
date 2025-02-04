@@ -411,6 +411,14 @@ For more detailed documentation and guides, please visit our [GitHub Discussions
 
 Conductor PM uses a custom design system built on top of [Material-UI (MUI)](https://mui.com/), a popular React UI framework. The design system consists of reusable UI components organized into the Core UI system, which provides a consistent and efficient way to build user interfaces throughout the application.
 
+### Global Theme System
+
+The Core UI system utilizes a global theme system built with Material UI's theming capabilities. The theme is defined in the `src/lib/ui/theme` directory and is applied to the entire application using a custom `ThemeProvider` component.
+
+To customize the theme, modify the `createTheme.ts` file in the `theme` directory. You can change the palette, typography, spacing, and other theme options to match your desired design system.
+
+For more information on the global theme system and how it integrates with the Core UI components, refer to the [CORE.md](src/lib/ui/core/CORE.md) file.
+
 ### Storybook
 
 We use [Storybook](https://storybook.js.org/) for developing and documenting our UI components. Storybook allows us to create isolated component examples, making it easier to test, document, and showcase our components.

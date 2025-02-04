@@ -5,7 +5,7 @@ import React from 'react';
 
 const meta: Meta<typeof useMediaQuery> = {
   title: "Core/Utils/useMediaQuery",
-  component: useMediaQuery,
+  component: () => <></>,
   tags: ["autodocs"],
 };
 
