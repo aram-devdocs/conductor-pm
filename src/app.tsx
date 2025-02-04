@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { Startup, ThemeProvider, useColorMode, ColorModeProvider } from "./lib";
+import Layout from './lib/ui/layout/Layout';
 
 const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
   return <ColorModeProvider>{children}</ColorModeProvider>;
@@ -10,7 +11,9 @@ const App = () => {
 
   return (
     <ThemeProvider mode={mode}>
-      <Startup />
+      <Layout>
+        <Startup />
+      </Layout>
     </ThemeProvider>
   );
 };
