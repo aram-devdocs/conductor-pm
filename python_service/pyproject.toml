@@ -3,7 +3,7 @@ name = "conductor-pm-agent"
 version = "0.1.0"
 description = "Job scheduling agent for Conductor PM"
 authors = ["Aram Hammoudeh <aram.hammoudeh@indr.com>"]
-packages = [{include = "*.py"}]
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"

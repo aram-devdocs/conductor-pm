@@ -12,4 +12,4 @@ services:
     restart: unless-stopped
 
   # Note: The Express server is part of the Electron app and runs locally 
-  # TODO: Move buisness logic to shared library and add seperate implementation here for both client and server, to provide same service as electron
+  # TODO: Move business logic to shared library and add separate implementation here for both client and server, to provide same service as electron

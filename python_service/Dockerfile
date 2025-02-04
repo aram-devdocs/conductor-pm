@@ -27,10 +27,10 @@ COPY python_service/pyproject.toml ./
 RUN poetry install --no-root --without dev
 
 # Copy application code
-COPY python_service/ .
+COPY python_service/src ./src
 COPY prisma/schema.prisma ./prisma/schema.prisma
 
 # Generate Prisma client
 RUN poetry run prisma generate --schema ./prisma/schema.prisma
 
-CMD ["poetry", "run", "python", "agent.py"] 
+CMD ["poetry", "run", "python", "-m", "src.agent"] 
