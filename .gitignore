@@ -105,3 +105,4 @@ sandbox
 
 data.db
 data.db-journal
+*storybook.log
