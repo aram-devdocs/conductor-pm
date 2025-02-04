@@ -2,7 +2,7 @@ import React from "react";
 import { Card, Typography, Button, Stack, Grid } from "../ui";
 import { useColorMode } from "../contexts";
 
-export const Startup: React.FC = () => {
+export const StartupScreen: React.FC = () => {
   const { mode, toggleColorMode } = useColorMode();
 
   return (
