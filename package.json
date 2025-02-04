@@ -12,7 +12,7 @@
     "lint": "eslint --ext .ts,.tsx .",
     "prepare": "husky",
     "prisma:generate": "cd python_service && poetry run prisma generate --schema ../prisma/schema.prisma",
-    "prisma:migrate": "cd python_service && poetry run prisma migrate dev",
+    "prisma:migrate": "cd python_service && poetry run prisma migrate dev --schema ../prisma/schema.prisma",
     "python:setup": "cd python_service && poetry install",
     "python:dev": "cd python_service && poetry install && poetry run python -m src.agent",
     "docker:build": "docker compose build",

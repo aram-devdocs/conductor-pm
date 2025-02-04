@@ -104,3 +104,4 @@ poetry.lock
 sandbox
 
 data.db
+data.db-journal
