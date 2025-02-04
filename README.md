@@ -55,7 +55,10 @@ The Python AI Agent communicates with the SQLite database through Prisma ORM, en
 ### Backend
 
 - Python-based AI agent
-- FastAPI for REST API
+- FastAPI for REST API with endpoints:
+  - `/health` - Health check endpoint
+  - `/sprint/current` - Get current sprint details
+  - `/users` - Get all users
 - Poetry for Python dependency management
 - Prisma for database ORM
 - SQLite for local data storage
@@ -101,14 +104,15 @@ This will:
 
 1. Configure your environment:
   ```bash
-
    # Copy example environment files
-
    cp .env.example .env
    cp python_service/.env.example python_service/.env
 
-   # Install Ollama (macOS/Linux)
+   # Add API configuration to python_service/.env:
+   API_HOST=0.0.0.0
+   API_PORT=8000
 
+   # Install Ollama (macOS/Linux)
    curl https://ollama.ai/install.sh | sh
    ```
 
@@ -176,6 +180,10 @@ The MVP currently supports:
 - Summary generation and storage
 - Local database integration
 - Ollama model management
+- REST API endpoints for:
+  - Health checks
+  - Sprint information
+  - User management
 
 ### AI Agent Capabilities
 

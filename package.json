@@ -19,7 +19,9 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
-    "setup": "npm install && npm run prisma:generate && cd python_service && poetry install && cd .."
+    "setup": "npm install && npm run prisma:generate && cd python_service && poetry install && cd ..",
+    "python:fix-lock": "cd python_service && poetry lock --no-update",
+    "python:dev:fix": "npm run python:fix-lock && npm run python:dev"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.6.1",
