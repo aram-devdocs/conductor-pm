@@ -59,9 +59,15 @@ The Python AI Agent communicates with the SQLite database through Prisma ORM, en
   - `/health` - Health check endpoint
   - `/sprint/current` - Get current sprint details
   - `/users` - Get all users
+  - `/ai/chat` - AI chat completion endpoint
+  - `/ai/embedding` - Text embedding endpoint
 - Poetry for Python dependency management
 - Prisma for database ORM
 - SQLite for local data storage
+- Flexible AI integration supporting:
+  - OpenAI API
+  - Custom OpenAI-compatible endpoints
+  - Ollama (planned)
 
 ### DevOps & Tools
 
@@ -111,6 +117,11 @@ This will:
    # Add API configuration to python_service/.env:
    API_HOST=0.0.0.0
    API_PORT=8000
+   
+   # Configure AI provider
+   OPENAI_API_KEY=your_api_key_here
+   OPENAI_MODEL=gpt-4  # or your preferred model
+   AI_PROVIDER=openai  # or custom/ollama
 
    # Install Ollama (macOS/Linux)
    curl https://ollama.ai/install.sh | sh
@@ -194,6 +205,11 @@ The agent currently supports:
 - Basic project status tracking
 - Local model inference using Ollama
 - Persistent task storage using SQLite
+- Flexible AI integration:
+  - Chat completions with configurable parameters
+  - Text embeddings for semantic search
+  - Support for multiple AI providers
+  - Custom API endpoint configuration
 
 ## Roadmap
 

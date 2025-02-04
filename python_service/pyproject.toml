@@ -14,6 +14,8 @@ croniter = "6.0.0"
 fastapi = "0.109.0"
 uvicorn = "0.27.0.post1"
 notion-client = "2.3.0"
+openai = "1.1.0"
+ollama = "^0.1.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"

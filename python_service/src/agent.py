@@ -6,6 +6,7 @@ import os
 
 from src.database.prisma_client import DatabaseClient
 from src.integrations.notion_client import NotionIntegration
+from src.integrations.openai_client import AIClientFactory, AIProvider
 from src.jobs.job_manager import JobManager
 
 logging.basicConfig(level=logging.INFO)
@@ -18,6 +19,37 @@ class JobAgent:
         self.notion_client = NotionIntegration()
         self.job_manager = JobManager(self.database_client)
         self.server_task = None
+        
+        # Initialize AI client
+        provider_str = os.getenv("AI_PROVIDER", "openai").lower()
+        model = os.getenv("AI_MODEL")  # Generic model env var
+        api_base = os.getenv("AI_API_BASE")  # Generic base URL env var
+        
+        # Provider-specific configurations
+        if provider_str == "openai":
+            api_key = os.getenv("OPENAI_API_KEY")
+            model = model or os.getenv("OPENAI_MODEL", "gpt-4")
+            api_base = api_base or os.getenv("OPENAI_API_BASE")
+        elif provider_str == "ollama":
+            api_key = None  # Ollama doesn't need an API key
+            model = model or os.getenv("OLLAMA_MODEL", "llama3.2")
+            api_base = api_base or os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
+        else:  # custom
+            api_key = os.getenv("CUSTOM_API_KEY")
+            model = model or os.getenv("CUSTOM_MODEL")
+            api_base = api_base or os.getenv("CUSTOM_API_BASE")
+        
+        try:
+            provider = AIProvider(provider_str)
+            self.ai_client = AIClientFactory.create_client(
+                provider=provider,
+                api_key=api_key,
+                model=model,
+                api_base=api_base
+            )
+        except Exception as e:
+            logger.error(f"Error initializing AI client: {str(e)}")
+            self.ai_client = None
 
     async def initialize(self):
         """
@@ -77,6 +109,22 @@ class JobAgent:
         await self.job_manager.stop()
         await self.database_client.disconnect()
         logger.info("Job agent stopped")
+
+    async def chat_with_ai(self, messages: list, **kwargs):
+        """
+        Wrapper method to interact with the AI model
+        """
+        if not self.ai_client:
+            raise ValueError("AI client not properly initialized")
+        return await self.ai_client.chat_completion(messages, **kwargs)
+
+    async def get_embedding(self, text: str):
+        """
+        Get embeddings for the given text
+        """
+        if not self.ai_client:
+            raise ValueError("AI client not properly initialized")
+        return await self.ai_client.embedding(text)
 
 async def main():
     agent = JobAgent()

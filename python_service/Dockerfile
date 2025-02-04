@@ -18,6 +18,9 @@ RUN curl -sSL https://install.python-poetry.org | python3 - && \
     ln -s /opt/poetry/bin/poetry && \
     poetry config virtualenvs.create false
 
+# Install additional Python packages
+RUN pip install --no-cache-dir openai httpx
+
 ENV DATABASE_URL="file:/app/data.db"
 
 # Copy Poetry configuration
