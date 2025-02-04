@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from "react";
 
 export const ColorModeContext = createContext({
   mode: "light" as "light" | "dark",
+  /* eslint-disable @typescript-eslint/no-empty-function */
   toggleColorMode: () => {},
 });
 
