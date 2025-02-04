@@ -103,7 +103,7 @@ The Python AI Agent communicates with the SQLite database through Prisma ORM, en
 
 2. Run the setup script:
    ```bash
-   npm run setup
+   yarn setup
    ```
 
 This will:
@@ -145,11 +145,11 @@ This will:
 
    # Start the Electron application
 
-   npm start
+   yarn start
 
    # In a separate terminal, start the Python development environment
 
-   npm run python:dev
+   yarn python:dev
    ```
 
 3. Docker commands:
@@ -157,15 +157,15 @@ This will:
 
    # Start containers
 
-   npm run docker:up
+   yarn docker:up
 
    # View logs
 
-   npm run docker:logs
+   yarn docker:logs
 
    # Stop containers
 
-   npm run docker:down
+   yarn docker:down
    ```
 
 ### Database Management
@@ -175,11 +175,11 @@ Prisma commands:
 
 # Generate Prisma clients
 
-npm run prisma:generate
+yarn prisma:generate
 
 # Run migrations
 
-npm run prisma:migrate
+yarn prisma:migrate
 ```
 
 ## Project Structure
@@ -370,39 +370,39 @@ For more detailed documentation and guides, please visit our [GitHub Discussions
 
 ### Development Commands
 
-- `npm start`: Launch the Electron application in development mode
-- `npm run python:dev`: Start the Python development environment with the AI agent
-- `npm run setup`: Complete project setup, installing all dependencies and generating Prisma clients
-- `npm run lint`: Run ESLint to check code quality and style
+- `yarn start`: Launch the Electron application in development mode
+- `yarn python:dev`: Start the Python development environment with the AI agent
+- `yarn setup`: Complete project setup, installing all dependencies and generating Prisma clients
+- `yarn lint`: Run ESLint to check code quality and style
 
 ### Build and Packaging Commands
 
-- `npm run package`: Package the Electron application for your current platform
-- `npm run make`: Create distributable packages (installers) for the application
-- `npm run publish`: Publish the application to a distribution platform
+- `yarn package`: Package the Electron application for your current platform
+- `yarn make`: Create distributable packages (installers) for the application
+- `yarn publish`: Publish the application to a distribution platform
 
 ### Database Management
 
-- `npm run prisma:generate`: Generate Prisma client based on the schema
-- `npm run prisma:migrate`: Run database migrations
-- `npm run python:fix-lock`: Update Poetry lock file without changing dependencies
+- `yarn prisma:generate`: Generate Prisma client based on the schema
+- `yarn prisma:migrate`: Run database migrations
+- `yarn python:fix-lock`: Update Poetry lock file without changing dependencies
 
 ### Python Environment
 
-- `npm run python:setup`: Install Python dependencies using Poetry
-- `npm run python:dev:fix`: Fix Poetry lock file and start the Python development environment
+- `yarn python:setup`: Install Python dependencies using Poetry
+- `yarn python:dev:fix`: Fix Poetry lock file and start the Python development environment
 
 ### Docker Commands
 
-- `npm run docker:build`: Build Docker containers
-- `npm run docker:up`: Start Docker containers in detached mode
-- `npm run docker:down`: Stop and remove Docker containers
-- `npm run docker:logs`: View logs from Docker containers
+- `yarn docker:build`: Build Docker containers
+- `yarn docker:up`: Start Docker containers in detached mode
+- `yarn docker:down`: Stop and remove Docker containers
+- `yarn docker:logs`: View logs from Docker containers
 
 ### Cleanup Command
 
-- `npm run clean`: Remove `node_modules`, `.webpack`, and `.out` directories to resolve potential build issues
+- `yarn clean`: Remove `node_modules`, `.webpack`, and `.out` directories to resolve potential build issues
 
 ### Husky Hooks
 
-- `npm run prepare`: Set up Husky git hooks for pre-commit checks
+- `yarn prepare`: Set up Husky git hooks for pre-commit checks

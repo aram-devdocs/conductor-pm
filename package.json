@@ -19,9 +19,9 @@
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
-    "setup": "npm install && npm run prisma:generate && cd python_service && poetry install && cd ..",
+    "setup": "yarn install && yarn prisma:generate && cd python_service && poetry install && cd ..",
     "python:fix-lock": "cd python_service && poetry lock --no-update",
-    "python:dev:fix": "npm run python:fix-lock && npm run python:dev",
+    "python:dev:fix": "yarn python:fix-lock && yarn python:dev",
     "clean": "rm -rf node_modules .webpack .out",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
