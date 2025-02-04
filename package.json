@@ -14,7 +14,7 @@
     "prisma:generate": "cd python_service && poetry run prisma generate --schema ../prisma/schema.prisma",
     "prisma:migrate": "prisma migrate dev",
     "python:setup": "cd python_service && poetry install",
-    "python:dev": "cd python_service && poetry install && cd .. && npx prisma@5.17.0 generate && cd python_service && poetry run python agent.py",
+    "python:dev": "cd python_service && poetry install && poetry run python agent.py",
     "docker:build": "docker compose build",
     "docker:up": "docker compose up -d",
     "docker:down": "docker compose down",

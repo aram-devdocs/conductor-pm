@@ -9,10 +9,11 @@ packages = [{include = "*.py"}]
 python = "^3.11"
 prisma = "^0.11.0"
 schedule = "1.2.1"
-python-dotenv = "1.0.0"
+python-dotenv = "^1.0.0"
 croniter = "6.0.0"
 fastapi = "0.109.0"
 uvicorn = "0.27.0.post1"
+notion-client = "2.3.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
