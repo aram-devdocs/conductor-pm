@@ -3,6 +3,7 @@ import logging
 from dotenv import load_dotenv
 import uvicorn
 import os
+import signal
 
 from src.database.prisma_client import DatabaseClient
 from src.integrations.notion_client import NotionIntegration
@@ -80,35 +81,84 @@ class JobAgent:
             port=int(os.getenv("API_PORT", "8000")),
             log_level="info"
         )
-        server = uvicorn.Server(config)
-        await server.serve()
+        self.server = uvicorn.Server(config)
+        self.server.config.setup_event_loop()
+        return await self.server.serve()
 
     async def start(self):
         """
-        Start the agent's job management and API server
+        Start the agent's job management and API server concurrently
         """
         try:
             await self.initialize()
-            # Create tasks for both the job manager and API server
+            
+            # Set up signal handling for graceful shutdown
+            loop = asyncio.get_running_loop()
+            stop_event = asyncio.Event()
+            
+            def signal_handler():
+                logger.info("Received shutdown signal")
+                if not stop_event.is_set():
+                    stop_event.set()
+            
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                loop.add_signal_handler(sig, signal_handler)
+            
+            # Start job manager and server tasks
+            self.job_manager_task = asyncio.create_task(self.job_manager.start())
             self.server_task = asyncio.create_task(self.start_server())
-            await self.job_manager.start()
+            
+            # Wait for either a stop signal or one of the tasks to complete
+            done, pending = await asyncio.wait(
+                [self.job_manager_task, self.server_task, asyncio.create_task(stop_event.wait())],
+                return_when=asyncio.FIRST_COMPLETED
+            )
+            
+            # Begin shutdown
+            await self.stop()
+            
         except Exception as e:
             logger.error(f"Error starting agent: {str(e)}")
             await self.stop()
 
     async def stop(self):
         """
-        Stop the agent and clean up resources
+        Stop the agent and clean up resources gracefully
         """
-        if self.server_task:
-            self.server_task.cancel()
-            try:
-                await self.server_task
-            except asyncio.CancelledError:
-                pass
-        await self.job_manager.stop()
-        await self.database_client.disconnect()
-        logger.info("Job agent stopped")
+        logger.info("Starting graceful shutdown...")
+        
+        # Stop the server first
+        if hasattr(self, 'server') and self.server:
+            self.server.should_exit = True
+            if hasattr(self, 'server_task') and not self.server_task.done():
+                try:
+                    await asyncio.wait_for(self.server_task, timeout=5.0)
+                except asyncio.TimeoutError:
+                    logger.warning("Server shutdown timed out")
+                    self.server_task.cancel()
+                except Exception as e:
+                    logger.error(f"Error shutting down server: {str(e)}")
+        
+        # Stop job manager
+        try:
+            if hasattr(self, 'job_manager_task') and not self.job_manager_task.done():
+                self.job_manager_task.cancel()
+                try:
+                    await asyncio.wait_for(self.job_manager_task, timeout=5.0)
+                except asyncio.TimeoutError:
+                    logger.warning("Job manager shutdown timed out")
+                except Exception as e:
+                    logger.error(f"Error stopping job manager: {str(e)}")
+        except Exception as e:
+            logger.error(f"Error during job manager shutdown: {str(e)}")
+        
+        # Disconnect database
+        try:
+            await self.database_client.disconnect()
+        except Exception as e:
+            logger.error(f"Error disconnecting database: {str(e)}")
+        
+        logger.info("Job agent stopped completely")
 
     async def chat_with_ai(self, messages: list, **kwargs):
         """
