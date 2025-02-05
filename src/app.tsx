@@ -8,8 +8,8 @@ import {
   SPAProvider,
   useSPA,
   SPA,
+  Layout,
 } from "./lib";
-import Layout from "./lib/ui/layout/Layout";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -77,7 +77,10 @@ const AppContent = () => {
   );
 };
 
-const root = createRoot(document.body);
+const rootElement = document.getElementById('root');
+if (!rootElement) throw new Error('Failed to find the root element');
+
+const root = createRoot(rootElement);
 root.render(
   <ContextWrapper>
     <AppContent />

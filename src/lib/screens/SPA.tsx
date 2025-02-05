@@ -1,12 +1,12 @@
 import React, { Suspense } from 'react';
 import { useSPA } from '../contexts/SPAContext';
-import { CircularProgress, Stack } from '../ui';
+import { CircularProgress, Stack, Box } from '../ui';
 
 const LoadingFallback = () => (
   <Stack 
     justifyContent="center" 
     alignItems="center" 
-    sx={{ minHeight: '100vh' }}
+    sx={{ height: '100%' }}
   >
     <CircularProgress />
   </Stack>
@@ -23,8 +23,10 @@ export const SPA: React.FC = () => {
   }
 
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <CurrentScreen {...screenProps} />
-    </Suspense>
+    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Suspense fallback={<LoadingFallback />}>
+        <CurrentScreen {...screenProps} />
+      </Suspense>
+    </Box>
   );
 }; 

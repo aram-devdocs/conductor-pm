@@ -26,6 +26,7 @@ import { useColorMode } from "../../contexts";
 import { useMediaQuery } from "../core/utils/useMediaQuery";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import MenuIcon from "@mui/icons-material/Menu";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -36,9 +37,10 @@ const APPBAR_HEIGHT = 64; // Standard AppBar height
 const BREADCRUMBS_HEIGHT = 48; // Height for breadcrumbs
 const TOTAL_TOP_HEIGHT = APPBAR_HEIGHT + BREADCRUMBS_HEIGHT;
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [mobileOpen, setMobileOpen] = React.useState(false);
   const {
     history,
     goBack,
@@ -50,6 +52,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   } = useSPA();
   const { mode, toggleColorMode } = useColorMode();
 
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   const breadcrumbLinks: BreadcrumbLink[] = history.map((entry) => ({
     label: entry.title || entry.id,
     onClick: () => navigateTo(entry.id, entry.props, entry.title),
@@ -60,26 +66,66 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     chat: <ChatIcon />,
   };
 
+  const drawer = (
+    <Box sx={{ overflow: "auto" }}>
+      <Toolbar /> {/* This creates space for the AppBar */}
+      <List>
+        {startingPoints.map((screenId) => (
+          <ListItem key={screenId} disablePadding>
+            <ListItemButton
+              selected={currentScreen === screenId}
+              onClick={() => {
+                navigateTo(screenId);
+                if (isMobile) {
+                  handleDrawerToggle();
+                }
+              }}
+            >
+              {startingPointIcons[screenId] && (
+                <ListItemIcon>{startingPointIcons[screenId]}</ListItemIcon>
+              )}
+              <ListItemText primary={screens[screenId].title || screenId} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+    </Box>
+  );
+
   return (
-    <Box sx={{ display: "flex" }}>
-      {/* AppBar */}
+    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
       <AppBar
+        position="fixed"
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
           height: APPBAR_HEIGHT,
-          position: "fixed",
+          backgroundColor: "background.default",
         }}
       >
         <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="back"
-            sx={{ mr: 2, visibility: canGoBack ? "visible" : "hidden" }}
-            onClick={() => goBack()}
-          >
-            <ArrowBackIcon />
-          </IconButton>
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
+          {canGoBack && (
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="back"
+              sx={{ mr: 2 }}
+              onClick={() => goBack()}
+            >
+              <ArrowBackIcon />
+            </IconButton>
+          )}
           <IconButton
             color="inherit"
             aria-label="toggle dark mode"
@@ -92,64 +138,62 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             Conductor PM
           </Typography>
         </Toolbar>
-
         <Breadcrumbs links={breadcrumbLinks} />
       </AppBar>
 
-      {/* Drawer */}
-      <Drawer
-        variant={isMobile ? "temporary" : "permanent"}
-        sx={{
-          width: DRAWER_WIDTH,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: {
-            width: DRAWER_WIDTH,
-            boxSizing: "border-box",
-          },
-        }}
+      <Box
+        component="nav"
+        sx={{ width: { sm: DRAWER_WIDTH }, flexShrink: { sm: 0 } }}
       >
-        <Toolbar /> {/* This creates space for the AppBar */}
-        <Box sx={{ overflow: "auto" }}>
-          <List>
-            {startingPoints.map((screenId) => (
-              <ListItem key={screenId} disablePadding>
-                <ListItemButton
-                  selected={currentScreen === screenId}
-                  onClick={() => navigateTo(screenId)}
-                >
-                  {startingPointIcons[screenId] && (
-                    <ListItemIcon>{startingPointIcons[screenId]}</ListItemIcon>
-                  )}
-                  <ListItemText primary={screens[screenId].title || screenId} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
-        </Box>
-      </Drawer>
+        {/* Mobile drawer */}
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': { 
+              boxSizing: 'border-box', 
+              width: DRAWER_WIDTH 
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+        
+        {/* Desktop drawer */}
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': { 
+              boxSizing: 'border-box', 
+              width: DRAWER_WIDTH 
+            },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+      </Box>
 
-      {/* Main content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          height: `calc(100vh - ${TOTAL_TOP_HEIGHT}px)`,
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          marginTop: `${TOTAL_TOP_HEIGHT}px`,
         }}
       >
-        {/* Content area */}
-        <Box
-          sx={{
-            height: `calc(100vh - ${TOTAL_TOP_HEIGHT + 24}px)`,
-            overflow: "auto",
-          }}
-        >
-          {children}
-        </Box>
+        {children}
       </Box>
     </Box>
   );
 };
-
-export default Layout;
