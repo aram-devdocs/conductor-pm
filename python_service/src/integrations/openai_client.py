@@ -9,6 +9,7 @@ from functools import partial
 import os
 import json
 from src.utils.cache import CacheManager
+import httpx
 
 logger = logging.getLogger(__name__)
 
@@ -193,10 +194,10 @@ class OllamaClient(BaseAIClient):
 class CustomAIClient(BaseAIClient):
     def __init__(self, api_key: str, model: str, api_base: str):
         super().__init__(api_key=api_key, model=model, api_base=api_base)
-        self.client = openai.AsyncOpenAI(
-            api_key=api_key,
-            base_url=f"{api_base}"
-        )
+        self.headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}"
+        }
 
     async def chat_completion(
         self,
@@ -213,19 +214,22 @@ class CustomAIClient(BaseAIClient):
             return AIResponse(content=cached_response)
             
         try:
-            # Structure the request with inferenceConfig
-            request_params = {
-                "model": self.model,
-                "messages": messages,
-                "inferenceConfig": {
-                    "temperature": temperature,
-                    "maxTokens": max_tokens
-                }
-            }
-            request_params.update(kwargs)
-            
-            response = await self.client.chat.completions.create(**request_params)
-            result = response.model_dump()
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{self.api_base}/chat/completions",
+                    headers=self.headers,
+                    json={
+                        "model": self.model,
+                        "messages": messages,
+                        "inferenceConfig": {
+                            "temperature": temperature,
+                            "maxTokens": max_tokens or 4000,
+                            **kwargs
+                        }
+                    }
+                )
+                response.raise_for_status()
+                result = response.json()
             
             # Cache the result
             self.cache.set(cache_key, result['choices'][0]['message']['content'], ttl=self.default_ttl)
