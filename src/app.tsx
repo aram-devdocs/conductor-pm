@@ -41,6 +41,12 @@ const ChatScreen = lazy(() =>
   }))
 );
 
+const DataFetchScreen = lazy(() =>
+  import("./lib/screens/data/DataFetchScreen").then((module) => ({
+    default: module.DataFetchScreen,
+  }))
+);
+
 const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -62,6 +68,7 @@ const AppContent = () => {
     // Register starting points
     registerScreen("welcome", WelcomeScreen, "Welcome", true);
     registerScreen("chat", ChatScreen, "Chat", true);
+    registerScreen("data", DataFetchScreen, "Data", true);
 
     // Register regular screens
     registerScreen("startup", StartupScreen, "Getting Started");
