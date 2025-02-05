@@ -95,7 +95,7 @@ class OpenAIClient(BaseAIClient):
             result = response.model_dump()
             
             # Cache the result
-            self.cache.set(cache_key, result, ttl=self.default_ttl)
+            self.cache.set(cache_key, result['choices'][0]['message']['content'], ttl=self.default_ttl)
             return AIResponse(
                 content=result['choices'][0]['message']['content'],
                 raw_response=result
@@ -193,13 +193,18 @@ class OllamaClient(BaseAIClient):
 class CustomAIClient(BaseAIClient):
     def __init__(self, api_key: str, model: str, api_base: str):
         super().__init__(api_key=api_key, model=model, api_base=api_base)
-        import httpx
-        self.client = httpx.AsyncClient(
-            base_url=api_base,
-            headers={"Authorization": f"Bearer {api_key}"}
+        self.client = openai.AsyncOpenAI(
+            api_key=api_key,
+            base_url=f"{api_base}"
         )
 
-    async def chat_completion(self, messages: List[Dict[str, str]], **kwargs) -> AIResponse:
+    async def chat_completion(
+        self,
+        messages: List[Dict[str, str]],
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = 4000,
+        **kwargs
+    ) -> AIResponse:
         cache_key = self._generate_cache_key(messages, **kwargs)
         
         # Try to get from cache first
@@ -208,13 +213,19 @@ class CustomAIClient(BaseAIClient):
             return AIResponse(content=cached_response)
             
         try:
-            response = await self.client.post("/v1/chat/completions", json={
+            # Structure the request with inferenceConfig
+            request_params = {
                 "model": self.model,
                 "messages": messages,
-                **kwargs
-            })
-            response.raise_for_status()
-            result = response.json()
+                "inferenceConfig": {
+                    "temperature": temperature,
+                    "maxTokens": max_tokens
+                }
+            }
+            request_params.update(kwargs)
+            
+            response = await self.client.chat.completions.create(**request_params)
+            result = response.model_dump()
             
             # Cache the result
             self.cache.set(cache_key, result['choices'][0]['message']['content'], ttl=self.default_ttl)
@@ -235,13 +246,11 @@ class CustomAIClient(BaseAIClient):
             return cached_embedding
             
         try:
-            response = await self.client.post("/v1/embeddings", json={
-                "model": self.model,
-                "input": text
-            })
-            response.raise_for_status()
-            result = response.json()
-            embedding = result["data"][0]["embedding"]
+            response = await self.client.embeddings.create(
+                model=self.model,
+                input=text
+            )
+            embedding = response.data[0].embedding
             
             # Cache the result
             self.cache.set(cache_key, embedding, ttl=self.default_ttl)

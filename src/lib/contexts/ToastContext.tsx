@@ -101,12 +101,13 @@ const ToastContainer: React.FC<{
     <div
       style={{
         position: "fixed",
-        top: "20px",
-        right: "20px",
+        bottom: "20px",
+        left: "20px",
         display: "flex",
-        flexDirection: "column",
+        flexDirection: "column-reverse", // Show newest at bottom
         gap: "10px",
         zIndex: 10000,
+        maxWidth: "400px", // Prevent toasts from getting too wide
       }}
     >
       {toasts.map((toast) => (
@@ -116,6 +117,7 @@ const ToastContainer: React.FC<{
           onClose={() => onRemove(toast.id)}
           sx={{
             zIndex: (theme) => theme.zIndex.drawer + 2,
+            width: "100%",
           }}
         >
           {toast.message}

@@ -9,6 +9,7 @@ import {
   useSPA,
   SPA,
   Layout,
+  DataContextProvider,
 } from "./lib";
 import { ToastProvider } from "./lib/contexts/ToastContext";
 
@@ -52,7 +53,9 @@ const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
     <QueryClientProvider client={queryClient}>
       <ColorModeProvider>
         <SPAProvider>
-          <ToastProvider>{children}</ToastProvider>
+          <ToastProvider>
+            <DataContextProvider>{children}</DataContextProvider>
+          </ToastProvider>
         </SPAProvider>
       </ColorModeProvider>
     </QueryClientProvider>
@@ -87,8 +90,8 @@ const AppContent = () => {
   );
 };
 
-const rootElement = document.getElementById('root');
-if (!rootElement) throw new Error('Failed to find the root element');
+const rootElement = document.getElementById("root");
+if (!rootElement) throw new Error("Failed to find the root element");
 
 const root = createRoot(rootElement);
 root.render(

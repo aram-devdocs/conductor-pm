@@ -19,6 +19,7 @@ import { useMediaQuery } from "../core/utils/useMediaQuery";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import MenuIcon from "@mui/icons-material/Menu";
+import { ContextBar } from "./ContextBar";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -27,7 +28,8 @@ interface LayoutProps {
 const DRAWER_WIDTH = 240;
 const APPBAR_HEIGHT = 64; // Standard AppBar height
 const BREADCRUMBS_HEIGHT = 48; // Height for breadcrumbs
-const TOTAL_TOP_HEIGHT = APPBAR_HEIGHT + BREADCRUMBS_HEIGHT;
+const CONTEXTBAR_HEIGHT = 48; // Height for context bar
+const TOTAL_TOP_HEIGHT = APPBAR_HEIGHT + BREADCRUMBS_HEIGHT + CONTEXTBAR_HEIGHT;
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const theme = useTheme();
@@ -150,6 +152,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </Typography>
         </Toolbar>
         <Breadcrumbs className="layout-breadcrumbs" links={breadcrumbLinks} />
+        <ContextBar />
       </AppBar>
 
       <Box
@@ -204,7 +207,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          marginTop: `${TOTAL_TOP_HEIGHT / 2}px`,
+          marginTop: `${TOTAL_TOP_HEIGHT}px`,
         }}
       >
         {children}

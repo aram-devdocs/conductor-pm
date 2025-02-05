@@ -55,7 +55,11 @@ export const DataView: React.FC<DataViewProps> = ({
           pt: 2,
         }}
       >
-        <DataTable data={data} isLoading={isLoading} />
+        <DataTable 
+          data={data} 
+          isLoading={isLoading} 
+          type={selectedType}
+        />
       </Box>
     </Box>
   );
