@@ -87,7 +87,10 @@
     "electron-squirrel-startup": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^9.0.3",
     "react-router-dom": "^7.1.5",
+    "rehype-highlight": "^7.0.2",
+    "rehype-raw": "^7.0.0",
     "uuid": "^11.0.5"
   }
 }
