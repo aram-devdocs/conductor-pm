@@ -35,6 +35,11 @@ class JobAgent:
             api_key = None  # Ollama doesn't need an API key
             model = model or os.getenv("OLLAMA_MODEL", "llama3.2")
             api_base = api_base or os.getenv("OLLAMA_API_BASE", "http://localhost:11434")
+        elif provider_str == "bedrock":
+            api_key = None  # Bedrock uses AWS credentials
+            aws_region = os.getenv("AWS_REGION")
+            aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
+            aws_secret_access_key = os.getenv("AWS_SECRET_ACCESS_KEY")
         else:  # custom
             api_key = os.getenv("CUSTOM_API_KEY")
             model = model or os.getenv("CUSTOM_MODEL")
@@ -42,12 +47,21 @@ class JobAgent:
         
         try:
             provider = AIProvider(provider_str)
-            self.ai_client = AIClientFactory.create_client(
-                provider=provider,
-                api_key=api_key,
-                model=model,
-                api_base=api_base
-            )
+            if provider == AIProvider.BEDROCK:
+                self.ai_client = AIClientFactory.create_client(
+                    provider=provider,
+                    model=model,
+                    aws_region=aws_region,
+                    aws_access_key_id=aws_access_key_id,
+                    aws_secret_access_key=aws_secret_access_key
+                )
+            else:
+                self.ai_client = AIClientFactory.create_client(
+                    provider=provider,
+                    api_key=api_key,
+                    model=model,
+                    api_base=api_base
+                )
         except Exception as e:
             logger.error(f"Error initializing AI client: {str(e)}")
             self.ai_client = None

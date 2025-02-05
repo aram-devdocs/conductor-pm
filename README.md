@@ -13,7 +13,7 @@ Conductor PM is an open-source project management tool that leverages AI to auto
 - 📅 Automated daily summaries and stakeholder updates
 - 🔄 Integration with Notion for ticket management
 - 🚀 Local-first architecture with future cloud deployment options
-- 🔐 Configurable AI backends (Ollama, OpenAI-compatible endpoints)
+- 🔐 Configurable AI backends (Ollama, OpenAI-compatible endpoints, AWS Bedrock)
 - 🐳 Docker-based agent system for flexible deployment
 
 ## Architecture
@@ -449,3 +449,64 @@ For more detailed information on the Core UI system, including how to use and cu
 
 - `yarn storybook`: Start the Storybook development server
 - `yarn build-storybook`: Build a static version of Storybook for deployment
+
+### AI Backend Configuration
+
+The system supports multiple AI backends through a unified configuration system. The core configuration uses these variables:
+
+```bash
+# Core AI Configuration
+AI_PROVIDER=<provider>  # openai, ollama, custom, or bedrock
+AI_MODEL=<model>       # Model identifier for the chosen provider
+```
+
+Available providers:
+
+1. **OpenAI**
+   ```bash
+   AI_PROVIDER=openai
+   AI_MODEL=gpt-4  # or another OpenAI model
+   OPENAI_API_KEY=your_api_key_here
+   OPENAI_API_BASE=https://api.openai.com/v1  # Optional: Override API base URL
+   ```
+
+2. **Ollama (Local)**
+   ```bash
+   AI_PROVIDER=ollama
+   AI_MODEL=llama2  # or another Ollama model
+   OLLAMA_API_BASE=http://localhost:11434
+   ```
+
+3. **AWS Bedrock**
+   ```bash
+   AI_PROVIDER=bedrock
+   AI_MODEL=us.anthropic.claude-3-5-sonnet-20241022-v2:0  # or another Bedrock model
+   AWS_REGION=us-east-1  # AWS region where Bedrock is available
+   AWS_ACCESS_KEY_ID=your_aws_access_key
+   AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+   ```
+
+   Available Bedrock models include:
+   - Anthropic Claude (us.anthropic.claude-3-5-sonnet-20241022-v2:0)
+   - Amazon Titan (amazon.titan-text-express-v1)
+   - AI21 Labs Jurassic (ai21.j2-ultra-v1)
+   
+   Note: AWS credentials can also be configured through AWS credentials file or IAM roles.
+
+4. **Custom Provider**
+   ```bash
+   AI_PROVIDER=custom
+   AI_MODEL=your_model_identifier
+   CUSTOM_API_KEY=your_api_key
+   CUSTOM_API_BASE=your_api_base_url
+   ```
+
+### Cache Configuration
+
+The AI system includes built-in caching support:
+```bash
+USE_REDIS=false  # Set to true to use Redis, false for local file-based cache
+REDIS_HOST=localhost  # Redis host (use 'redis' for Docker)
+REDIS_PORT=6379  # Redis port
+REDIS_DB=0  # Redis database number
+```
