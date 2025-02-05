@@ -15,6 +15,7 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
+  useTheme,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HomeIcon from "@mui/icons-material/Home";
@@ -22,6 +23,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import { Breadcrumbs, BreadcrumbLink } from "../core/navigation/Breadcrumbs";
 import { useSPA } from "../../contexts/SPAContext";
 import { useColorMode } from "../../contexts";
+import { useMediaQuery } from "../core/utils/useMediaQuery";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 
@@ -30,8 +32,13 @@ interface LayoutProps {
 }
 
 const DRAWER_WIDTH = 240;
+const APPBAR_HEIGHT = 64; // Standard AppBar height
+const BREADCRUMBS_HEIGHT = 48; // Height for breadcrumbs
+const TOTAL_TOP_HEIGHT = APPBAR_HEIGHT + BREADCRUMBS_HEIGHT;
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const {
     history,
     goBack,
@@ -48,24 +55,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     onClick: () => navigateTo(entry.id, entry.props, entry.title),
   }));
 
-  // Map of starting point IDs to their icons
   const startingPointIcons: Record<string, React.ReactElement> = {
     welcome: <HomeIcon />,
     chat: <ChatIcon />,
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        minHeight: "100vh",
-        // debug yellow border
-        border: "1px solid yellow",
-      }}
-    >
+    <Box sx={{ display: "flex" }}>
+      {/* AppBar */}
       <AppBar
-        position="fixed"
-        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        sx={{
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+          height: APPBAR_HEIGHT,
+          position: "fixed",
+        }}
       >
         <Toolbar>
           <IconButton
@@ -89,66 +92,61 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             Conductor PM
           </Typography>
         </Toolbar>
-        <Paper
-          elevation={0}
-          square
-          sx={{
-            bgcolor: "background.default",
-            borderBottom: 1,
-            borderColor: "divider",
-            px: 2,
-            py: 1,
-          }}
-        >
-          <Breadcrumbs links={breadcrumbLinks} />
-        </Paper>
+
+        <Breadcrumbs links={breadcrumbLinks} />
       </AppBar>
+
+      {/* Drawer */}
       <Drawer
-        variant="permanent"
+        variant={isMobile ? "temporary" : "permanent"}
         sx={{
           width: DRAWER_WIDTH,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
-            top: "auto",
-            marginTop: "112px",
           },
         }}
       >
-        <List>
-          {startingPoints.map((screenId) => (
-            <ListItem key={screenId} disablePadding>
-              <ListItemButton
-                selected={currentScreen === screenId}
-                onClick={() => navigateTo(screenId)}
-              >
-                {startingPointIcons[screenId] && (
-                  <ListItemIcon>{startingPointIcons[screenId]}</ListItemIcon>
-                )}
-                <ListItemText primary={screens[screenId].title || screenId} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-        <Divider />
+        <Toolbar /> {/* This creates space for the AppBar */}
+        <Box sx={{ overflow: "auto" }}>
+          <List>
+            {startingPoints.map((screenId) => (
+              <ListItem key={screenId} disablePadding>
+                <ListItemButton
+                  selected={currentScreen === screenId}
+                  onClick={() => navigateTo(screenId)}
+                >
+                  {startingPointIcons[screenId] && (
+                    <ListItemIcon>{startingPointIcons[screenId]}</ListItemIcon>
+                  )}
+                  <ListItemText primary={screens[screenId].title || screenId} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+        </Box>
       </Drawer>
+
+      {/* Main content */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 2,
-          marginTop: "112px",
-          marginLeft: `${DRAWER_WIDTH}px`,
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          width: "100%",
-          //   debug blue border
-          border: "1px solid blue",
+          p: 3,
+          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
         }}
       >
-        {children}
+        {/* Content area */}
+        <Box
+          sx={{
+            height: `calc(100vh - ${TOTAL_TOP_HEIGHT + 24}px)`,
+            overflow: "auto",
+          }}
+        >
+          {children}
+        </Box>
       </Box>
     </Box>
   );

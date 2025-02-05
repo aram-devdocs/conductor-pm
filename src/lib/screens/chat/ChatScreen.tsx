@@ -10,8 +10,6 @@ export const ChatScreen: React.FC = () => {
     <Box
       sx={{
         height: "100vh",
-        border: "1px solid red",
-        width: "100%",
       }}
     >
       <ChatView
