@@ -21,6 +21,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
 }) => {
   return (
     <Box
+      className="chat-view"
       sx={{
         display: "flex",
         flexDirection: "column",

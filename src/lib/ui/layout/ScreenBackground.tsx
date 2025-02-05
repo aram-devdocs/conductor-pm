@@ -12,6 +12,7 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
 
   return (
     <Box
+      className="screen-background"
       sx={{
         height: "100%",
         width: "100%",
@@ -20,7 +21,8 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
       }}
     >
       <Container
-        maxWidth={false}
+        className="screen-background-container"
+        maxWidth="xl"
         sx={{
           flex: 1,
           display: "flex",
@@ -35,6 +37,7 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
         }}
       >
         <Box
+          className="screen-background-box"
           sx={{
             flex: 1,
             width: "100%",

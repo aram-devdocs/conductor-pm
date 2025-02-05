@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  AppBar,
-  Box,
-  Toolbar,
-  Typography,
-  IconButton,
-  Drawer,
-} from "../core";
+import { AppBar, Box, Toolbar, Typography, IconButton, Drawer } from "../core";
 import {
   List,
   ListItem,
@@ -93,8 +86,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <Box
+      className="layout-root-container"
+      sx={{
+        display: "flex",
+        height: "100vh",
+        overflow: "hidden",
+        width: "100vw",
+      }}
+    >
       <AppBar
+        className="layout-app-bar"
         position="fixed"
         sx={{
           zIndex: (theme) => theme.zIndex.drawer + 1,
@@ -102,9 +104,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           backgroundColor: "background.default",
         }}
       >
-        <Toolbar>
+        <Toolbar className="layout-toolbar">
           {isMobile && (
             <IconButton
+              className="layout-mobile-menu-toggle"
               color="inherit"
               aria-label="open drawer"
               edge="start"
@@ -116,6 +119,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           )}
           {canGoBack && (
             <IconButton
+              className="layout-back-button"
               edge="start"
               color="inherit"
               aria-label="back"
@@ -126,6 +130,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </IconButton>
           )}
           <IconButton
+            className="layout-theme-toggle"
             color="inherit"
             aria-label="toggle dark mode"
             sx={{ mr: 2 }}
@@ -133,19 +138,27 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             {mode === "light" ? <Brightness4Icon /> : <Brightness7Icon />}
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            className="layout-title"
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ flexGrow: 1 }}
+          >
             Conductor PM
           </Typography>
         </Toolbar>
-        <Breadcrumbs links={breadcrumbLinks} />
+        <Breadcrumbs className="layout-breadcrumbs" links={breadcrumbLinks} />
       </AppBar>
 
       <Box
+        className="layout-navigation-container"
         component="nav"
         sx={{ width: { sm: DRAWER_WIDTH }, flexShrink: { sm: 0 } }}
       >
         {/* Mobile drawer */}
         <Drawer
+          className="layout-mobile-drawer"
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
@@ -153,24 +166,25 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: DRAWER_WIDTH 
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: DRAWER_WIDTH,
             },
           }}
         >
           {drawer}
         </Drawer>
-        
+
         {/* Desktop drawer */}
         <Drawer
+          className="layout-desktop-drawer"
           variant="permanent"
           sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { 
-              boxSizing: 'border-box', 
-              width: DRAWER_WIDTH 
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: DRAWER_WIDTH,
             },
           }}
           open
@@ -180,6 +194,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </Box>
 
       <Box
+        className="layout-main-content"
         component="main"
         sx={{
           flexGrow: 1,
