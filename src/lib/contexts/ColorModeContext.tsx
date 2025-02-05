@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+
+const COLOR_MODE_KEY = 'conductor_color_mode';
 
 export const ColorModeContext = createContext({
   mode: "light" as "light" | "dark",
@@ -9,10 +11,23 @@ export const ColorModeContext = createContext({
 export const ColorModeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [mode, setMode] = useState<"light" | "dark">("light");
+  // Try to get initial mode from local storage, default to light
+  const [mode, setMode] = useState<"light" | "dark">(() => {
+    const savedMode = localStorage.getItem(COLOR_MODE_KEY);
+    return savedMode === "dark" ? "dark" : "light";
+  });
+
+  // Update local storage whenever mode changes
+  useEffect(() => {
+    localStorage.setItem(COLOR_MODE_KEY, mode);
+  }, [mode]);
 
   const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+    setMode((prevMode) => {
+      const newMode = prevMode === "light" ? "dark" : "light";
+      localStorage.setItem(COLOR_MODE_KEY, newMode);
+      return newMode;
+    });
   };
 
   return (

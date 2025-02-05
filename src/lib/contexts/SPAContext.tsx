@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 interface ScreenHistoryEntry {
   id: string;
   props?: Record<string, any>;
   title?: string;
+  timestamp?: number;
 }
 
 interface Screen {
@@ -42,6 +43,9 @@ interface SPAContextType {
 
 const SPAContext = createContext<SPAContextType | null>(null);
 
+const LAST_PAGE_KEY = 'conductor_last_page';
+const LAST_PAGE_EXPIRY = 15 * 60 * 1000; // 15 minutes in milliseconds
+
 export const useSPA = () => {
   const context = useContext(SPAContext);
   if (!context) {
@@ -57,9 +61,34 @@ export const SPAProvider: React.FC<{ children: React.ReactNode }> = ({
   const [showLayout, setShowLayout] = useState(true);
   const [screens, setScreens] = useState<Record<string, Screen>>({});
   const [history, setHistory] = useState<ScreenHistoryEntry[]>([
-    { id: "welcome" },
+    { id: "welcome", timestamp: Date.now() },
   ]);
   const [historyIndex, setHistoryIndex] = useState(0);
+
+  // Check local storage for last page on initial load
+  useEffect(() => {
+    const storedPage = localStorage.getItem(LAST_PAGE_KEY);
+    if (storedPage) {
+      try {
+        const parsedPage = JSON.parse(storedPage);
+        const currentTime = Date.now();
+        
+        // Check if the stored page is within the 15-minute expiry
+        if (currentTime - parsedPage.timestamp <= LAST_PAGE_EXPIRY) {
+          setCurrentScreen(parsedPage.id);
+          setHistory([{ 
+            id: parsedPage.id, 
+            props: parsedPage.props, 
+            timestamp: parsedPage.timestamp 
+          }]);
+        }
+      } catch (error) {
+        console.error('Error parsing stored page:', error);
+        // Fallback to default screen if parsing fails
+        localStorage.removeItem(LAST_PAGE_KEY);
+      }
+    }
+  }, []);
 
   const registerScreen = useCallback(
     (
@@ -95,10 +124,15 @@ export const SPAProvider: React.FC<{ children: React.ReactNode }> = ({
         id: screenId,
         props,
         title: screens[screenId].title,
+        timestamp: Date.now(),
       };
       setHistory([newEntry]);
       setHistoryIndex(0);
       setCurrentScreen(screenId);
+      
+      // Update local storage
+      localStorage.setItem(LAST_PAGE_KEY, JSON.stringify(newEntry));
+      
       setScreens((prev) => ({
         ...prev,
         [screenId]: { ...prev[screenId], props },
@@ -137,12 +171,16 @@ export const SPAProvider: React.FC<{ children: React.ReactNode }> = ({
           id: screenId,
           props,
           title: title || screens[screenId].title,
+          timestamp: Date.now(),
         };
         setHistory((prev) => {
           const newHistory = prev.slice(0, historyIndex + 1);
           return [...newHistory, newEntry];
         });
         setHistoryIndex((prev) => prev + 1);
+        
+        // Update local storage
+        localStorage.setItem(LAST_PAGE_KEY, JSON.stringify(newEntry));
       }
 
       setCurrentScreen(screenId);
@@ -166,6 +204,9 @@ export const SPAProvider: React.FC<{ children: React.ReactNode }> = ({
         setHistoryIndex(targetIndex);
         // Trim history to remove any forward entries
         setHistory((prev) => prev.slice(0, targetIndex + 1));
+        
+        // Update local storage
+        localStorage.setItem(LAST_PAGE_KEY, JSON.stringify(targetEntry));
       }
     },
     [history, historyIndex]
