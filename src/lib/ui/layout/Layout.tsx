@@ -93,6 +93,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         height: "100vh",
         overflow: "hidden",
         width: "100vw",
+        backgroundColor: (theme) => theme.palette.background.default,
       }}
     >
       <AppBar
@@ -199,11 +200,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         sx={{
           flexGrow: 1,
           height: `calc(100vh - ${TOTAL_TOP_HEIGHT}px)`,
-          width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
+          width: { sm: `calc(100vh - ${DRAWER_WIDTH}px)` },
           overflow: "hidden",
           display: "flex",
           flexDirection: "column",
-          marginTop: `${TOTAL_TOP_HEIGHT}px`,
+          marginTop: `${TOTAL_TOP_HEIGHT / 2}px`,
         }}
       >
         {children}

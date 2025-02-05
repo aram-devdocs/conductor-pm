@@ -15,7 +15,6 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
       className="screen-background"
       sx={{
         height: "100%",
-        width: "100%",
         display: "flex",
         flexDirection: "column",
       }}
@@ -27,8 +26,6 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
           flex: 1,
           display: "flex",
           flexDirection: "column",
-          height: "100%",
-          width: "100%",
           padding: {
             xs: theme.spacing(2),
             sm: theme.spacing(3),
@@ -40,8 +37,6 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
           className="screen-background-box"
           sx={{
             flex: 1,
-            width: "100%",
-            height: "100%",
             display: "flex",
             flexDirection: "column",
             backgroundColor: "background.default",

@@ -33,27 +33,27 @@ const lightPalette = {
 // Lime Green (#81b622), Yellow Green (#ecf87f), Green (#59981a)
 const darkPalette = {
   primary: {
-    main: "#59981a", // Green
-    light: "#81b622", // Lime Green
-    dark: "#1b2a06", // Darkened Olive Green
-    contrastText: "#ffffff",
+    main: "#2c5e0d", // Deeper, more muted green
+    light: "#4a8c1a", // Slightly lighter muted green
+    dark: "#1b3a09", // Very dark green, almost black-green
+    contrastText: "#f0f0f0", // Soft off-white for better contrast
   },
   secondary: {
-    main: "#ecf87f", // Yellow Green
-    light: "#f5ffd7", // Lightened Yellow Green for contrast
-    dark: "#81b622", // Lime Green
-    contrastText: "#000000",
+    main: "#c4e664", // Softer, less bright yellow-green
+    light: "#d6eb8a", // Lighter, more muted yellow-green
+    dark: "#8ca63c", // Darker, more subdued green
+    contrastText: "#1b3a09", // Dark green for text
   },
   background: {
-    default: "#1b2a06", // Darkened Olive Green
-    paper: "#3d550c", // Olive Green
+    default: "#121d0a", // Very dark green, almost black
+    paper: "#1b3a09", // Dark green for paper/card backgrounds
   },
   text: {
-    primary: "#ffffff",
-    secondary: "#ecf87f", // Yellow Green
-    disabled: "#adb5bd",
+    primary: "#e0e0e0", // Light gray for primary text for better contrast
+    secondary: "#c4e664", // Soft yellow-green for secondary text
+    disabled: "#7a7a7a", // Muted gray for disabled text
   },
-  divider: "#59981a", // Green
+  divider: "#4a8c1a", // Muted green for dividers
 };
 
 const theme = createTheme({
