@@ -10,6 +10,7 @@ import {
   SPA,
   Layout,
 } from "./lib";
+import { ToastProvider } from "./lib/contexts/ToastContext";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -44,7 +45,9 @@ const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <ColorModeProvider>
-        <SPAProvider>{children}</SPAProvider>
+        <SPAProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </SPAProvider>
       </ColorModeProvider>
     </QueryClientProvider>
   );

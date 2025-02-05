@@ -32,7 +32,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
       }}
     >
       <Box sx={{ flex: 1, overflow: "auto", minHeight: 0 }}>
-        <MessageList messages={messages} />
+        <MessageList messages={messages} isLoading={isLoading} />
       </Box>
       <MessageComposer
         onSendMessage={onSendMessage}

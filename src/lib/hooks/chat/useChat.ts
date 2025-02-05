@@ -4,10 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { chatEndpoints } from '../../api/chat/client';
 import type { ChatMessage } from '../../api/chat/types';
 import type { Message } from '../../ui/templates/chat';
+import { useToast } from '../../contexts/ToastContext';
 
 export const useChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const queryClient = useQueryClient();
+  const { showErrorToast } = useToast();
 
   const chatMutation = useMutation({
     mutationFn: async (content: string) => {
@@ -34,9 +36,18 @@ export const useChat = () => {
       // Invalidate relevant queries if needed
       queryClient.invalidateQueries({ queryKey: chatEndpoints.chat.queryKey() });
     },
+    onError: (error) => {
+      // Show error toast
+      showErrorToast(error.message || 'Failed to send message. Please try again.');
+      
+      // Remove the last user message that failed to send
+      setMessages(prev => prev.slice(0, -1));
+    }
   });
 
   const sendMessage = useCallback((content: string) => {
+    if (!content.trim()) return; // Prevent sending empty messages
+
     const newMessage: Message = {
       id: uuidv4(),
       content,
