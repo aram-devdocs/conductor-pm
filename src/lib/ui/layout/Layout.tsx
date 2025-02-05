@@ -5,7 +5,6 @@ import {
   Toolbar,
   Typography,
   IconButton,
-  Paper,
   Drawer,
 } from "../core";
 import {

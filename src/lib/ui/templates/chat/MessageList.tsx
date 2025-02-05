@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { MessageBubble } from "../../components/chat";
 import { Dots } from "../../components/loading";
 
