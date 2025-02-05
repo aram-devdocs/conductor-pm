@@ -26,22 +26,27 @@ export const ChatView: React.FC<ChatViewProps> = ({
         display: "flex",
         flexDirection: "column",
         height: "100%",
-        flex: 1,
-        overflow: "hidden",
-        backgroundColor: "background.default",
-        borderRadius: 4,
-        border: "1px solid",
-        borderColor: "divider",
+        width: "100%",
+        position: "relative",
+     
       }}
     >
-      <Box sx={{ flex: 1, overflow: "auto", minHeight: 0 }}>
+      <Box 
+        sx={{ 
+          flex: 1,
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
         <MessageList messages={messages} isLoading={isLoading} />
       </Box>
-      <MessageComposer
-        onSendMessage={onSendMessage}
-        disabled={isLoading}
-        placeholder={placeholder}
-      />
+      <Box sx={{ position: "relative", zIndex: 2 }}>
+        <MessageComposer
+          onSendMessage={onSendMessage}
+          disabled={isLoading}
+          placeholder={placeholder}
+        />
+      </Box>
     </Box>
   );
 };

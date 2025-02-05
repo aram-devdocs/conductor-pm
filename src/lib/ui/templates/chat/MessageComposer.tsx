@@ -17,14 +17,11 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
     <Paper
       elevation={3}
       sx={{
-        position: 'sticky',
-        bottom: 0,
-        zIndex: 1,
         borderTop: 1,
         borderColor: 'divider',
       }}
     >
-      <Box sx={{ maxWidth: '100%' }}>
+      <Box sx={{ width: '100%', p: 1, backgroundColor: 'background.paper' }}>
         <MessageInput
           onSendMessage={onSendMessage}
           disabled={disabled}
