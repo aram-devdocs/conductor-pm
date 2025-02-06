@@ -94,8 +94,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
         <ReactMarkdown
           rehypePlugins={[rehypeHighlight, rehypeRaw]}
           components={{
-            code: ({ node, className, children, ...props }) => {
-              const match = /language-(\w+)/.exec(className || "");
+            code: ({ className, children, ...props }) => {
               return (
                 <code className={className} {...props}>
                   {children}

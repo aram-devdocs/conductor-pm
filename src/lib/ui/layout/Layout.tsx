@@ -12,6 +12,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HomeIcon from "@mui/icons-material/Home";
 import ChatIcon from "@mui/icons-material/Chat";
+import DataObjectIcon from "@mui/icons-material/DataObject";
 import { Breadcrumbs, BreadcrumbLink } from "../core/navigation/Breadcrumbs";
 import { useSPA } from "../../contexts/SPAContext";
 import { useColorMode } from "../../contexts";
@@ -58,6 +59,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const startingPointIcons: Record<string, React.ReactElement> = {
     welcome: <HomeIcon />,
     chat: <ChatIcon />,
+    data: <DataObjectIcon />,
   };
 
   const drawer = (

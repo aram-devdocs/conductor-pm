@@ -10,6 +10,7 @@ import {
   SPA,
   Layout,
   DataContextProvider,
+  ChatContextProvider,
 } from "./lib";
 import { ToastProvider } from "./lib/contexts/ToastContext";
 
@@ -54,7 +55,11 @@ const ContextWrapper = ({ children }: { children: React.ReactNode }) => {
       <ColorModeProvider>
         <SPAProvider>
           <ToastProvider>
-            <DataContextProvider>{children}</DataContextProvider>
+            <DataContextProvider>
+              <ChatContextProvider>
+                {children}
+              </ChatContextProvider>
+            </DataContextProvider>
           </ToastProvider>
         </SPAProvider>
       </ColorModeProvider>

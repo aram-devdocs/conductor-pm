@@ -5,6 +5,7 @@ import { DataTable } from "../../components/data/DataTable";
 import type { DataType } from "../../../api/data/types";
 
 interface DataViewProps {
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   data: any[];
   isLoading: boolean;
   selectedType: DataType;

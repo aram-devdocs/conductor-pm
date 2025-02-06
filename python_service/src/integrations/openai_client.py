@@ -46,27 +46,21 @@ class BaseAIClient(ABC):
         """Default cache TTL for AI responses (1 hour)"""
         return 3600
 
-    def _generate_cache_key(self, messages: List[Dict[str, str]], **kwargs) -> str:
-        """Generate a unique cache key for the request"""
-        key_parts = [
-            self.model,
-            json.dumps(messages, sort_keys=True),
-            json.dumps(kwargs, sort_keys=True),
-        ]
-        return f"ai_response_{'_'.join(key_parts)}"
+    def _generate_cache_key(self, thread_id: str, **kwargs) -> str:
+        return f"ai_chat_completion_{thread_id}"
 
-    def _generate_embedding_cache_key(self, text: str) -> str:
+    def _generate_embedding_cache_key(self, text: str, thread_id: str) -> str:
         """Generate a unique cache key for embeddings"""
-        return f"ai_embedding_{self.model}_{text}"
+        return f"ai_embedding_{thread_id}_{self.model}_{text}"
 
     @abstractmethod
     async def chat_completion(
-        self, messages: List[Dict[str, str]], **kwargs
+        self, messages: List[Dict[str, str]], thread_id: str, **kwargs
     ) -> AIResponse:
         pass
 
     @abstractmethod
-    async def embedding(self, text: str) -> List[float]:
+    async def embedding(self, text: str, thread_id: str) -> List[float]:
         pass
 
 
@@ -88,16 +82,17 @@ class OpenAIClient(BaseAIClient):
     async def chat_completion(
         self,
         messages: List[Dict[str, str]],
+        thread_id: str,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
         **kwargs,
     ) -> AIResponse:
-        cache_key = self._generate_cache_key(messages, **kwargs)
+        cache_key = self._generate_cache_key(thread_id, **kwargs)
 
-        # Try to get from cache first
-        cached_response = self.cache.get(cache_key)
-        if cached_response is not None:
-            return AIResponse(content=cached_response)
+        # # Try to get from cache first
+        # cached_response = self.cache.get(cache_key)
+        # if cached_response is not None:
+        #     return AIResponse(content=cached_response)
 
         try:
             response = await self.client.chat.completions.create(
@@ -122,13 +117,8 @@ class OpenAIClient(BaseAIClient):
             logger.error(f"Error in chat completion: {str(e)}")
             raise
 
-    async def embedding(self, text: str) -> List[float]:
-        cache_key = self._generate_embedding_cache_key(text)
-
-        # Try to get from cache first
-        cached_embedding = self.cache.get(cache_key)
-        if cached_embedding is not None:
-            return cached_embedding
+    async def embedding(self, text: str, thread_id: str) -> List[float]:
+        cache_key = self._generate_embedding_cache_key(text, thread_id)
 
         try:
             response = await self.client.embeddings.create(
@@ -156,16 +146,17 @@ class OllamaClient(BaseAIClient):
     async def chat_completion(
         self,
         messages: List[Dict[str, str]],
+        thread_id: str,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
         **kwargs,
     ) -> AIResponse:
-        cache_key = self._generate_cache_key(messages, **kwargs)
+        cache_key = self._generate_cache_key(thread_id, **kwargs)
 
-        # Try to get from cache first
-        cached_response = self.cache.get(cache_key)
-        if cached_response is not None:
-            return AIResponse(content=cached_response)
+        # # Try to get from cache first
+        # cached_response = self.cache.get(cache_key)
+        # if cached_response is not None:
+        #     return AIResponse(content=cached_response)
 
         try:
             response = await self.client.chat(
@@ -188,13 +179,8 @@ class OllamaClient(BaseAIClient):
             logger.error(f"Error in Ollama chat completion: {str(e)}")
             raise
 
-    async def embedding(self, text: str) -> List[float]:
-        cache_key = self._generate_embedding_cache_key(text)
-
-        # Try to get from cache first
-        cached_embedding = self.cache.get(cache_key)
-        if cached_embedding is not None:
-            return cached_embedding
+    async def embedding(self, text: str, thread_id: str) -> List[float]:
+        cache_key = self._generate_embedding_cache_key(text, thread_id)
 
         try:
             response = await self.client.embeddings(
@@ -221,16 +207,17 @@ class CustomAIClient(BaseAIClient):
     async def chat_completion(
         self,
         messages: List[Dict[str, str]],
+        thread_id: str,
         temperature: float = 0.7,
         max_tokens: Optional[int] = 4000,
         **kwargs,
     ) -> AIResponse:
-        cache_key = self._generate_cache_key(messages, **kwargs)
+        cache_key = self._generate_cache_key(thread_id, **kwargs)
 
-        # Try to get from cache first
-        cached_response = self.cache.get(cache_key)
-        if cached_response is not None:
-            return AIResponse(content=cached_response)
+        # # Try to get from cache first
+        # cached_response = self.cache.get(cache_key)
+        # if cached_response is not None:
+        #     return AIResponse(content=cached_response)
 
         try:
             async with httpx.AsyncClient() as client:
@@ -263,13 +250,8 @@ class CustomAIClient(BaseAIClient):
             logger.error(f"Error in chat completion: {str(e)}")
             raise
 
-    async def embedding(self, text: str) -> List[float]:
-        cache_key = self._generate_embedding_cache_key(text)
-
-        # Try to get from cache first
-        cached_embedding = self.cache.get(cache_key)
-        if cached_embedding is not None:
-            return cached_embedding
+    async def embedding(self, text: str, thread_id: str) -> List[float]:
+        cache_key = self._generate_embedding_cache_key(text, thread_id)
 
         try:
             response = await self.client.embeddings.create(model=self.model, input=text)
@@ -302,16 +284,17 @@ class BedrockClient(BaseAIClient):
     async def chat_completion(
         self,
         messages: List[Dict[str, str]],
+        thread_id: str,
         temperature: float = 0.7,
         max_tokens: Optional[int] = None,
         **kwargs,
     ) -> AIResponse:
-        cache_key = self._generate_cache_key(messages, **kwargs)
+        cache_key = self._generate_cache_key(thread_id, **kwargs)
 
-        # Try to get from cache first
-        cached_response = self.cache.get(cache_key)
-        if cached_response is not None:
-            return AIResponse(content=cached_response)
+        # # Try to get from cache first
+        # cached_response = self.cache.get(cache_key)
+        # if cached_response is not None:
+        #     return AIResponse(content=cached_response)
 
         try:
             # Check if using Claude 3
@@ -365,13 +348,8 @@ class BedrockClient(BaseAIClient):
             logger.error(f"Error in Bedrock chat completion: {str(e)}")
             raise
 
-    async def embedding(self, text: str) -> List[float]:
-        cache_key = self._generate_embedding_cache_key(text)
-
-        # Try to get from cache first
-        cached_embedding = self.cache.get(cache_key)
-        if cached_embedding is not None:
-            return cached_embedding
+    async def embedding(self, text: str, thread_id: str) -> List[float]:
+        cache_key = self._generate_embedding_cache_key(text, thread_id)
 
         try:
             body = {"inputText": text}

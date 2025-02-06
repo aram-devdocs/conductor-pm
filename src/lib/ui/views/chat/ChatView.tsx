@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, Typography, Chip } from "@mui/material";
 import {
   MessageList,
   MessageComposer,
@@ -11,6 +11,7 @@ interface ChatViewProps {
   onSendMessage: (message: string) => void;
   isLoading?: boolean;
   placeholder?: string;
+  model?: string;
 }
 
 export const ChatView: React.FC<ChatViewProps> = ({
@@ -18,6 +19,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
   onSendMessage,
   isLoading = false,
   placeholder,
+  model,
 }) => {
   return (
     <Box
@@ -28,9 +30,34 @@ export const ChatView: React.FC<ChatViewProps> = ({
         height: "100%",
         width: "100%",
         position: "relative",
-     
       }}
     >
+      {/* Header */}
+      <Box
+        sx={{
+          p: 2,
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          bgcolor: "background.paper",
+        }}
+      >
+        <Typography variant="h6" component="div">
+          Chat
+        </Typography>
+        {model && (
+          <Chip
+            label={model}
+            color="primary"
+            variant="outlined"
+            size="small"
+          />
+        )}
+      </Box>
+
+      {/* Messages */}
       <Box 
         sx={{ 
           flex: 1,
@@ -40,7 +67,9 @@ export const ChatView: React.FC<ChatViewProps> = ({
       >
         <MessageList messages={messages} isLoading={isLoading} />
       </Box>
-      <Box sx={{ position: "relative", zIndex: 2 }}>
+
+      {/* Composer */}
+      <Box sx={{ position: "relative", zIndex: 2, bgcolor: "background.paper", borderTop: "1px solid", borderColor: "divider" }}>
         <MessageComposer
           onSendMessage={onSendMessage}
           disabled={isLoading}

@@ -7,6 +7,7 @@ export interface ChatRequest {
   messages: ChatMessage[];
   temperature?: number;
   max_tokens?: number;
+  thread_id: string;
 }
 
 export interface ChatResponse {
@@ -20,4 +21,18 @@ export interface EmbeddingRequest {
 
 export interface EmbeddingResponse {
   embedding: number[];
-} 
+}
+
+export interface ChatThreadResponse {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  model: string;
+  messages: ChatMessage[] | null;
+}
+
+export interface ChatThreadCreate {
+  model: string;
+}
+
+export type ChatThread = ChatThreadResponse; 

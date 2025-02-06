@@ -19,14 +19,14 @@ export type ApiEndpoint<T extends ApiContract<any, any, any, any, any>> = {
   method: T["method"];
   path: T["path"];
   createRequest: (data: T["request"]) => Promise<T["response"]>;
-  queryKey: (params: T["queryParams"]) => readonly unknown[];
+  queryKey: (params: T["request"]) => readonly unknown[];
 };
 
 export const createEndpoint = <T extends ApiContract<any, any, any, any, any>>(
   config: T,
   implementation: {
     createRequest: (data: T["request"]) => Promise<T["response"]>;
-    queryKey: (params: T["queryParams"]) => readonly unknown[];
+    queryKey: (params: T["request"]) => readonly unknown[];
   }
 ): ApiEndpoint<T> => {
   return {
